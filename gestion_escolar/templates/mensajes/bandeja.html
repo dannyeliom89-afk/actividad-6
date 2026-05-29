@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}Mensajes{% endblock %}
+{% block page_title %}Mensajería Interna{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'mensaje_enviar' %}" class="btn btn-sm btn-primary">
+    <i class="bi bi-envelope-plus me-1"></i>Nuevo Mensaje
+  </a>
+{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <!-- Recibidos -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header bg-white d-flex align-items-center gap-2">
+        <i class="bi bi-inbox-fill text-primary"></i>
+        Recibidos
+        {% if no_leidos %}<span class="badge bg-danger rounded-pill">{{ no_leidos }}</span>{% endif %}
+      </div>
+      <div class="list-group list-group-flush">
+        {% for msg in recibidos %}
+        <a href="{% url 'mensaje_leer' msg.pk %}" class="list-group-item list-group-item-action {% if not msg.leido %}bg-primary-subtle{% endif %}">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-semibold d-flex align-items-center gap-2">
+                {% if not msg.leido %}<span class="badge bg-danger rounded-pill" style="font-size:.6rem;">Nueva</span>{% endif %}
+                {{ msg.asunto|truncatechars:35 }}
+              </div>
+              <small class="text-muted">De: {{ msg.de_usuario.get_full_name|default:msg.de_usuario.username }}</small>
+            </div>
+            <small class="text-muted">{{ msg.fecha_envio|date:"d/m H:i" }}</small>
+          </div>
+        </a>
+        {% empty %}
+        <div class="text-center text-muted py-4">
+          <i class="bi bi-inbox fs-2 d-block mb-2"></i><small>Sin mensajes recibidos</small>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Enviados -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header bg-white d-flex align-items-center gap-2">
+        <i class="bi bi-send-fill text-secondary"></i>Enviados
+      </div>
+      <div class="list-group list-group-flush">
+        {% for msg in enviados %}
+        <a href="{% url 'mensaje_leer' msg.pk %}" class="list-group-item list-group-item-action">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-semibold">{{ msg.asunto|truncatechars:35 }}</div>
+              <small class="text-muted">Para: {{ msg.para_usuario.get_full_name|default:msg.para_usuario.username }}</small>
+            </div>
+            <div class="text-end">
+              <small class="text-muted d-block">{{ msg.fecha_envio|date:"d/m H:i" }}</small>
+              {% if msg.leido %}<small class="text-success"><i class="bi bi-check2-all"></i></small>
+              {% else %}<small class="text-muted"><i class="bi bi-check2"></i></small>{% endif %}
+            </div>
+          </div>
+        </a>
+        {% empty %}
+        <div class="text-center text-muted py-4">
+          <i class="bi bi-send fs-2 d-block mb-2"></i><small>Sin mensajes enviados</small>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

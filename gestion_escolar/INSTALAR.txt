@@ -1,0 +1,94 @@
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  GUÍA DE INSTALACIÓN — Sistema Gestión de Actividades       ║
+# ║  I.E. 1122 María Auxiliadora — Puno                         ║
+# ╚══════════════════════════════════════════════════════════════╝
+#
+# REQUISITOS PREVIOS:
+#   • Python 3.10 o superior  →  https://www.python.org/downloads/
+#   • PostgreSQL 14+           →  https://www.postgresql.org/download/
+#   • pip actualizado
+#
+# ══════════════════════════════════════════════════════════════
+# PASO 1 — Abrir PowerShell en la carpeta del proyecto
+# ══════════════════════════════════════════════════════════════
+#
+#   cd "C:\Users\USER\actividad 6to\gestion_escolar"
+#
+# ══════════════════════════════════════════════════════════════
+# PASO 2 — Crear entorno virtual e instalar dependencias
+# ══════════════════════════════════════════════════════════════
+
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# ══════════════════════════════════════════════════════════════
+# PASO 3 — Configurar variables de entorno
+# ══════════════════════════════════════════════════════════════
+
+copy .env.example .env
+# Luego editar .env con tus credenciales reales de PostgreSQL
+
+# ══════════════════════════════════════════════════════════════
+# PASO 4 — Crear la base de datos en PostgreSQL
+# ══════════════════════════════════════════════════════════════
+#
+# Abrir psql o pgAdmin y ejecutar:
+#   CREATE DATABASE gestion_escolar_db;
+#
+# Desde PowerShell (si psql está en el PATH):
+#
+#   psql -U postgres -c "CREATE DATABASE gestion_escolar_db;"
+
+# ══════════════════════════════════════════════════════════════
+# PASO 5 — Aplicar migraciones
+# ══════════════════════════════════════════════════════════════
+
+python manage.py makemigrations core
+python manage.py migrate
+
+# ══════════════════════════════════════════════════════════════
+# PASO 6 — Crear superusuario (panel /admin/)
+# ══════════════════════════════════════════════════════════════
+
+python manage.py createsuperuser
+# Ingresar: username=admin, email=admin@ie1122.edu.pe, password=Admin2024!
+
+# ══════════════════════════════════════════════════════════════
+# PASO 7 — Cargar datos de demostración
+# ══════════════════════════════════════════════════════════════
+
+python manage.py seed_data
+
+# ══════════════════════════════════════════════════════════════
+# PASO 8 — Crear carpeta de archivos media
+# ══════════════════════════════════════════════════════════════
+
+mkdir media
+mkdir media\evidencias
+mkdir media\perfiles
+
+# ══════════════════════════════════════════════════════════════
+# PASO 9 — Iniciar el servidor de desarrollo
+# ══════════════════════════════════════════════════════════════
+
+python manage.py runserver
+
+# ══════════════════════════════════════════════════════════════
+# ACCESO AL SISTEMA
+# ══════════════════════════════════════════════════════════════
+#
+#   🌐 URL principal:   http://127.0.0.1:8000/
+#   🔐 Panel admin:     http://127.0.0.1:8000/admin/
+#
+#   CREDENCIALES DEMO:
+#   ┌──────────────┬──────────────┬──────────────────┐
+#   │ Rol          │ Usuario      │ Contraseña       │
+#   ├──────────────┼──────────────┼──────────────────┤
+#   │ Director     │ director     │ Director2024!    │
+#   │ Docente 1    │ docente1     │ Docente2024!     │
+#   │ Docente 2    │ docente2     │ Docente2024!     │
+#   │ Docente 3    │ docente3     │ Docente2024!     │
+#   │ Docente 4    │ docente4     │ Docente2024!     │
+#   └──────────────┴──────────────┴──────────────────┘

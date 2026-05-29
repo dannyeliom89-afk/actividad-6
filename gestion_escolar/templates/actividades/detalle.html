@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block title %}{{ actividad.titulo }}{% endblock %}
+{% block page_title %}Detalle de Actividad{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'reporte_actividad_pdf' actividad.pk %}" class="btn btn-sm btn-outline-danger" target="_blank">
+    <i class="bi bi-file-pdf me-1"></i>PDF
+  </a>
+  {% if user.is_director %}
+  <a href="{% url 'actividad_editar' actividad.pk %}" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-pencil me-1"></i>Editar
+  </a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <!-- Info principal -->
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="fw-bold fs-6">{{ actividad.titulo }}</span>
+        <span class="badge badge-{{ actividad.estado }} px-3 py-2 rounded-pill fs-6">{{ actividad.get_estado_display }}</span>
+      </div>
+      <div class="card-body">
+        <p class="text-muted">{{ actividad.descripcion }}</p>
+        <div class="row g-3 mt-1">
+          <div class="col-sm-4">
+            <div class="text-muted small">Fecha</div>
+            <div class="fw-semibold">{{ actividad.fecha|date:"d \d\e F \d\e Y" }}</div>
+          </div>
+          <div class="col-sm-4">
+            <div class="text-muted small">Lugar</div>
+            <div class="fw-semibold">{{ actividad.lugar|default:"No especificado" }}</div>
+          </div>
+
+          <div class="col-sm-6">
+            <div class="text-muted small">Creado por</div>
+            <div class="fw-semibold">{{ actividad.created_by.get_full_name|default:actividad.created_by.username }}</div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small">Fecha de registro</div>
+            <div class="fw-semibold">{{ actividad.fecha_creacion|date:"d/m/Y H:i" }}</div>
+          </div>
+        </div>
+        <hr>
+      </div>
+    </div>
+
+    <!-- Evidencias -->
+    <div class="card">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-images text-primary me-2"></i>Evidencias Fotográficas</span>
+        <span class="badge bg-secondary">{{ evidencias.count }}</span>
+      </div>
+      <div class="card-body">
+        <!-- Subir evidencia -->
+        <form method="post" enctype="multipart/form-data" action="{% url 'evidencia_subir_actividad' actividad.pk %}" class="mb-4">
+          {% csrf_token %}
+          <div class="row g-2 align-items-end">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small">Seleccionar imagen</label>
+              {{ form_evidencia.imagen }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-semibold small">Descripción</label>
+              {{ form_evidencia.descripcion }}
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-upload"></i>
+              </button>
+            </div>
+          </div>
+        </form>
+        <!-- Grid de evidencias -->
+        {% if evidencias %}
+        <div class="row g-3">
+          {% for ev in evidencias %}
+          <div class="col-sm-6 col-md-4">
+            <div class="card h-100">
+              <img src="{{ ev.imagen.url }}" class="evidencia-img" alt="{{ ev.descripcion }}">
+              <div class="card-body p-2">
+                <small class="text-muted d-block">{{ ev.descripcion|default:"Sin descripción" }}</small>
+                <small class="text-muted">{{ ev.subido_por.get_full_name|default:ev.subido_por.username }}</small>
+              </div>
+              {% if ev.subido_por == user or user.is_director %}
+              <div class="card-footer p-1">
+                <form method="post" action="{% url 'evidencia_eliminar' ev.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger w-100 py-1"
+                          onclick="return confirm('¿Eliminar esta evidencia?')">
+                    <i class="bi bi-trash"></i> Eliminar
+                  </button>
+                </form>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-4">
+          <i class="bi bi-image fs-2 d-block mb-2"></i>No hay evidencias aún
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar info -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header bg-white"><i class="bi bi-info-circle me-2"></i>Información</div>
+      <div class="card-body">
+        <div class="d-flex flex-column gap-3">
+          <div>
+            <div class="text-muted small">Estado actual</div>
+            <span class="badge badge-{{ actividad.estado }} px-3 py-2 rounded-pill">{{ actividad.get_estado_display }}</span>
+          </div>
+          <div>
+            <div class="text-muted small">Total evidencias</div>
+            <div class="fw-bold fs-4 text-primary">{{ evidencias.count }}</div>
+          </div>
+          <div>
+            <div class="text-muted small">Última actualización</div>
+            <div class="small">{{ actividad.fecha_actualizacion|date:"d/m/Y H:i" }}</div>
+          </div>
+        </div>
+        {% if user.is_director %}
+        <hr>
+        <div class="d-grid gap-2">
+          <a href="{% url 'actividad_editar' actividad.pk %}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-pencil me-1"></i>Editar actividad
+          </a>
+          <a href="{% url 'actividad_eliminar' actividad.pk %}" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-trash me-1"></i>Eliminar
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

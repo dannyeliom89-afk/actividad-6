@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Revisar Propuesta{% endblock %}
+{% block page_title %}Revisar Propuesta{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <!-- Detalle de la propuesta -->
+    <div class="card mb-4">
+      <div class="card-header bg-white">
+        <i class="bi bi-lightbulb-fill text-warning me-2"></i>{{ propuesta.titulo }}
+      </div>
+      <div class="card-body">
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <div class="text-muted small">Propuesto por</div>
+            <div class="fw-semibold">{{ propuesta.propuesta_por.get_full_name|default:propuesta.propuesta_por.username }}</div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small">Fecha de propuesta</div>
+            <div class="fw-semibold">{{ propuesta.fecha_propuesta|date:"d/m/Y H:i" }}</div>
+          </div>
+          {% if propuesta.fecha_actividad_propuesta %}
+          <div class="col-sm-6">
+            <div class="text-muted small">Fecha propuesta para actividad</div>
+            <div class="fw-semibold">{{ propuesta.fecha_actividad_propuesta|date:"d/m/Y" }}</div>
+          </div>
+          {% endif %}
+        </div>
+        <p class="mb-0">{{ propuesta.descripcion }}</p>
+      </div>
+    </div>
+    <!-- Formulario de revisión -->
+    <div class="card border-primary">
+      <div class="card-header bg-primary text-white">
+        <i class="bi bi-check2-square me-2"></i>Decisión del Director
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Decisión <span class="text-danger">*</span></label>
+            {{ form.estado }}
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Observaciones / Comentarios</label>
+            {{ form.observacion_admin }}
+            <small class="text-muted">El docente recibirá un mensaje con tu decisión y este comentario.</small>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-send me-1"></i>Enviar Decisión
+            </button>
+            <a href="{% url 'propuestas_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

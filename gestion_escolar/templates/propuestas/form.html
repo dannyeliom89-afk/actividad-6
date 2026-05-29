@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Nueva Propuesta{% endblock %}
+{% block page_title %}Proponer Actividad{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header bg-white">
+        <i class="bi bi-lightbulb-fill text-warning me-2"></i>Nueva Propuesta de Actividad
+      </div>
+      <div class="card-body">
+        <p class="text-muted small mb-4">Tu propuesta será enviada al director para su revisión y aprobación.</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Título de la propuesta <span class="text-danger">*</span></label>
+            {{ form.titulo }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Descripción <span class="text-danger">*</span></label>
+            {{ form.descripcion }}
+            <small class="text-muted">Describe el objetivo, los beneficios y los recursos necesarios.</small>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Fecha propuesta (opcional)</label>
+            {{ form.fecha_actividad_propuesta }}
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-send me-1"></i>Enviar Propuesta
+            </button>
+            <a href="{% url 'propuestas_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

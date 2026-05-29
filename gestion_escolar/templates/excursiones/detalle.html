@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block title %}{{ excursion }}{% endblock %}
+{% block page_title %}Detalle de Excursión{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'excursion_editar' excursion.pk %}" class="btn btn-sm btn-outline-primary">
+    <i class="bi bi-pencil me-1"></i>Editar
+  </a>
+{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-header bg-white">
+        <i class="bi bi-geo-alt-fill text-danger me-2"></i>{{ excursion.destino.nombre }}
+        <span class="badge {% if excursion.estado == 'realizada' %}bg-success{% elif excursion.estado == 'cancelada' %}bg-danger{% else %}bg-primary{% endif %} ms-2">{{ excursion.get_estado_display }}</span>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-sm-4">
+            <div class="text-muted small">Sección</div>
+            <div class="fw-semibold">{{ excursion.seccion.nombre }}</div>
+          </div>
+          <div class="col-sm-4">
+            <div class="text-muted small">Fecha</div>
+            <div class="fw-semibold">{{ excursion.fecha|date:"d/m/Y" }}</div>
+          </div>
+          <div class="col-sm-4">
+            <div class="text-muted small">Responsable</div>
+            <div class="fw-semibold">{{ excursion.responsable.get_full_name|default:excursion.responsable.username }}</div>
+          </div>
+          <div class="col-sm-4">
+            <div class="text-muted small">Estudiantes</div>
+            <div class="fw-semibold">{{ excursion.num_estudiantes }}</div>
+          </div>
+          <div class="col-sm-4">
+            <div class="text-muted small">Ubicación destino</div>
+            <div class="fw-semibold">{{ excursion.destino.ubicacion|default:"—" }}</div>
+          </div>
+          {% if excursion.descripcion %}
+          <div class="col-12">
+            <div class="text-muted small">Descripción</div>
+            <p class="mb-0">{{ excursion.descripcion }}</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Evidencias -->
+    <div class="card">
+      <div class="card-header bg-white d-flex justify-content-between">
+        <span><i class="bi bi-images text-primary me-2"></i>Evidencias Fotográficas</span>
+        <span class="badge bg-secondary">{{ evidencias.count }}</span>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data" action="{% url 'evidencia_subir_excursion' excursion.pk %}" class="mb-4">
+          {% csrf_token %}
+          <div class="row g-2 align-items-end">
+            <div class="col-md-6">{{ form_evidencia.imagen }}</div>
+            <div class="col-md-4">{{ form_evidencia.descripcion }}</div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-primary w-100"><i class="bi bi-upload"></i></button>
+            </div>
+          </div>
+        </form>
+        {% if evidencias %}
+        <div class="row g-3">
+          {% for ev in evidencias %}
+          <div class="col-sm-6 col-md-4">
+            <div class="card h-100">
+              <img src="{{ ev.imagen.url }}" class="evidencia-img" alt="{{ ev.descripcion }}">
+              <div class="card-body p-2">
+                <small class="text-muted">{{ ev.descripcion|default:"Sin descripción" }}</small>
+              </div>
+              {% if ev.subido_por == user or user.is_director %}
+              <div class="card-footer p-1">
+                <form method="post" action="{% url 'evidencia_eliminar' ev.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-outline-danger w-100 py-1"
+                          onclick="return confirm('¿Eliminar esta evidencia?')">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center text-muted py-4">
+          <i class="bi bi-image fs-2 d-block mb-2"></i>Sin evidencias aún
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header bg-white"><i class="bi bi-info-circle me-2"></i>Acciones</div>
+      <div class="card-body d-grid gap-2">
+        <a href="{% url 'excursion_editar' excursion.pk %}" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-pencil me-1"></i>Editar excursión
+        </a>
+        <a href="{% url 'excursion_eliminar' excursion.pk %}" class="btn btn-outline-danger btn-sm">
+          <i class="bi bi-trash me-1"></i>Eliminar
+        </a>
+        <a href="{% url 'excursiones_lista' %}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left me-1"></i>Volver a la lista
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

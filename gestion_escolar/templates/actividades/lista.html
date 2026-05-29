@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}Actividades{% endblock %}
+{% block page_title %}Actividades Institucionales{% endblock %}
+{% block topbar_actions %}
+  {% if user.is_director %}
+  <a href="{% url 'actividad_crear' %}" class="btn btn-sm btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Nueva Actividad
+  </a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- Filtros -->
+<div class="card mb-4">
+  <div class="card-body py-3">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-md-5">
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" name="q" class="form-control" placeholder="Buscar actividad..." value="{{ q }}">
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select name="estado" class="form-select">
+          <option value="">Todos los estados</option>
+          {% for val, label in estados %}
+          <option value="{{ val }}" {% if estado == val %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-funnel me-1"></i>Filtrar</button>
+        <a href="{% url 'actividades_lista' %}" class="btn btn-outline-secondary">Limpiar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Tabla -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Título</th>
+            <th>Fecha</th>
+            <th>Lugar</th>
+            <th>Estado</th>
+            <th>Evidencias</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for act in actividades %}
+          <tr>
+            <td>
+              <a href="{% url 'actividad_detalle' act.pk %}" class="fw-semibold text-decoration-none text-dark">
+                {{ act.titulo|truncatechars:40 }}
+              </a>
+            </td>
+            <td><small class="text-muted">{{ act.fecha|date:"d/m/Y" }}</small></td>
+            <td><small class="text-muted">{{ act.lugar|default:"—" }}</small></td>
+            <td>
+              <span class="badge badge-{{ act.estado }} px-2 py-1 rounded-pill">
+                {{ act.get_estado_display }}
+              </span>
+            </td>
+            <td class="text-center">
+              <span class="badge bg-secondary">{{ act.evidencias.count }} <i class="bi bi-image"></i></span>
+            </td>
+            <td>
+              <div class="d-flex gap-1">
+                <a href="{% url 'actividad_detalle' act.pk %}" class="btn btn-sm btn-light" title="Ver"><i class="bi bi-eye"></i></a>
+                <a href="{% url 'reporte_actividad_pdf' act.pk %}" class="btn btn-sm btn-light" title="PDF" target="_blank"><i class="bi bi-file-pdf text-danger"></i></a>
+                {% if user.is_director %}
+                <a href="{% url 'actividad_editar' act.pk %}" class="btn btn-sm btn-light" title="Editar"><i class="bi bi-pencil"></i></a>
+                <a href="{% url 'actividad_eliminar' act.pk %}" class="btn btn-sm btn-light text-danger" title="Eliminar"><i class="bi bi-trash"></i></a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+            <td colspan="6" class="text-center py-5 text-muted">
+              No se encontraron actividades
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

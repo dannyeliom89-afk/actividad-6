@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Nuevo Aviso{% endblock %}
+{% block page_title %}Crear Aviso{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header bg-white">
+        <i class="bi bi-megaphone-fill text-danger me-2"></i>Crear Aviso/Comunicado
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Título <span class="text-danger">*</span></label>
+            {{ form.titulo }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Mensaje <span class="text-danger">*</span></label>
+            {{ form.mensaje }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Destinatarios específicos</label>
+            <div class="border rounded p-3" style="max-height:200px;overflow-y:auto;">
+              {% for checkbox in form.destinatarios %}
+              <div class="form-check">{{ checkbox }}</div>
+              {% endfor %}
+            </div>
+            <small class="text-muted">Deja vacío para enviar a todos los docentes.</small>
+          </div>
+          <div class="mb-4 form-check">
+            {{ form.es_urgente }}
+            <label class="form-check-label fw-semibold text-danger">Marcar como urgente</label>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-send me-1"></i>Publicar Aviso
+            </button>
+            <a href="{% url 'avisos_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Reportes{% endblock %}
+{% block page_title %}Panel de Reportes{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'reporte_general_pdf' %}" class="btn btn-sm btn-danger" target="_blank">
+    <i class="bi bi-file-pdf me-1"></i>PDF General
+  </a>
+{% endblock %}
+{% block content %}
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-primary">
+      <div class="label">Total Actividades</div>
+      <div class="value">{{ stats.total }}</div>
+      <i class="bi bi-calendar-event-fill icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-warning">
+      <div class="label">Pendientes</div>
+      <div class="value">{{ stats.pendiente }}</div>
+      <i class="bi bi-hourglass icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-info">
+      <div class="label">En Proceso</div>
+      <div class="value">{{ stats.en_proceso }}</div>
+      <i class="bi bi-arrow-repeat icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-success">
+      <div class="label">Finalizadas</div>
+      <div class="value">{{ stats.finalizada }}</div>
+      <i class="bi bi-check-circle icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-danger">
+      <div class="label">Canceladas</div>
+      <div class="value">{{ stats.cancelada }}</div>
+      <i class="bi bi-x-circle icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-purple">
+      <div class="label">Excursiones</div>
+      <div class="value">{{ stats.excursiones }}</div>
+      <i class="bi bi-map icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-info">
+      <div class="label">Evidencias</div>
+      <div class="value">{{ stats.evidencias }}</div>
+      <i class="bi bi-images icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-success">
+      <div class="label">Props. Aprobadas</div>
+      <div class="value">{{ stats.propuestas_aprobadas }}</div>
+      <i class="bi bi-lightbulb icon"></i>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla y PDFs por actividad -->
+<div class="card">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-table text-primary me-2"></i>Todas las Actividades</span>
+    <div class="d-flex gap-2">
+      <a href="{% url 'reporte_general_pdf' %}?estado=pendiente" class="btn btn-sm btn-outline-warning" target="_blank">PDF Pendientes</a>
+      <a href="{% url 'reporte_general_pdf' %}?estado=finalizada" class="btn btn-sm btn-outline-success" target="_blank">PDF Finalizadas</a>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr><th>Actividad</th><th>Fecha</th><th>Estado</th><th>Evidencias</th><th>PDF</th></tr>
+        </thead>
+        <tbody>
+          {% for act in actividades %}
+          <tr>
+            <td><a href="{% url 'actividad_detalle' act.pk %}" class="fw-semibold text-decoration-none">{{ act.titulo|truncatechars:45 }}</a></td>
+            <td><small class="text-muted">{{ act.fecha|date:"d/m/Y" }}</small></td>
+            <td><span class="badge badge-{{ act.estado }} rounded-pill px-2 py-1">{{ act.get_estado_display }}</span></td>
+            <td class="text-center"><span class="badge bg-secondary">{{ act.evidencias.count }}</span></td>
+            <td>
+              <a href="{% url 'reporte_actividad_pdf' act.pk %}" class="btn btn-sm btn-outline-danger py-1 px-2" target="_blank">
+                <i class="bi bi-file-pdf"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-muted py-4">Sin actividades</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

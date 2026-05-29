@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Mi Perfil{% endblock %}
+{% block page_title %}Mi Perfil{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header bg-white d-flex align-items-center gap-3">
+        <div class="avatar-placeholder" style="width:48px;height:48px;font-size:1.1rem;">
+          {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+        </div>
+        <div>
+          <h5 class="mb-0">{{ user.get_full_name|default:user.username }}</h5>
+          <small class="text-muted">{{ user.get_role_display }} — @{{ user.username }}</small>
+        </div>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Nombres</label>
+              {{ form.first_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Apellidos</label>
+              {{ form.last_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Correo electrónico</label>
+              {{ form.email }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Teléfono</label>
+              {{ form.telefono }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Fecha de nacimiento</label>
+              {{ form.fecha_nacimiento }}
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-semibold">Foto de perfil</label>
+              {{ form.foto_perfil }}
+              {% if user.foto_perfil %}
+              <div class="mt-2">
+                <img src="{{ user.foto_perfil.url }}" style="height:80px;border-radius:.5rem;" alt="Foto actual">
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg me-1"></i>Guardar Cambios
+            </button>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger">
+              <i class="bi bi-box-arrow-left me-1"></i>Cerrar Sesión
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

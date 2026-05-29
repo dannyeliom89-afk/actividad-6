@@ -1,0 +1,8 @@
+Django>=4.2,<5.0
+psycopg2-binary>=2.9
+Pillow>=10.0
+reportlab>=4.0
+python-dotenv>=1.0
+django-crispy-forms>=2.1
+crispy-bootstrap5>=2024.2
+whitenoise>=6.0

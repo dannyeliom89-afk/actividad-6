@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard Director{% endblock %}
+{% block page_title %}Dashboard — Director{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'actividad_crear' %}" class="btn btn-sm btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Nueva Actividad
+  </a>
+{% endblock %}
+
+{% block content %}
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-primary">
+      <div class="label">Total Actividades</div>
+      <div class="value">{{ stats.total_actividades }}</div>
+      <i class="bi bi-calendar-event-fill icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-warning">
+      <div class="label">Pendientes</div>
+      <div class="value">{{ stats.actividades_pendientes }}</div>
+      <i class="bi bi-hourglass-split icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-info">
+      <div class="label">En Proceso</div>
+      <div class="value">{{ stats.actividades_en_proceso }}</div>
+      <i class="bi bi-arrow-repeat icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-success">
+      <div class="label">Finalizadas</div>
+      <div class="value">{{ stats.actividades_finalizadas }}</div>
+      <i class="bi bi-check-circle-fill icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-danger">
+      <div class="label">Propuestas Pendientes</div>
+      <div class="value">{{ stats.propuestas_pendientes }}</div>
+      <i class="bi bi-lightbulb-fill icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-purple">
+      <div class="label">Excursiones</div>
+      <div class="value">{{ stats.total_excursiones }}</div>
+      <i class="bi bi-map-fill icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-primary">
+      <div class="label">Docentes</div>
+      <div class="value">{{ stats.total_docentes }}</div>
+      <i class="bi bi-people-fill icon"></i>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card bg-grad-info">
+      <div class="label">Mensajes No Leídos</div>
+      <div class="value">{{ stats.mensajes_no_leidos }}</div>
+      <i class="bi bi-envelope-fill icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Actividades Recientes -->
+  <div class="col-lg-7">
+    <div class="card h-100">
+      <div class="card-header d-flex justify-content-between align-items-center bg-white">
+        <span><i class="bi bi-calendar-event-fill text-primary me-2"></i>Actividades Recientes</span>
+        <a href="{% url 'actividades_lista' %}" class="btn btn-sm btn-outline-primary">Ver todas</a>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light"><tr>
+              <th>Título</th><th>Fecha</th><th>Estado</th><th>Evidencias</th>
+            </tr></thead>
+            <tbody>
+            {% for act in actividades_recientes %}
+            <tr>
+              <td><a href="{% url 'actividad_detalle' act.pk %}" class="text-decoration-none fw-semibold">{{ act.titulo|truncatechars:35 }}</a></td>
+              <td><small class="text-muted">{{ act.fecha|date:"d/m/Y" }}</small></td>
+              <td><span class="badge badge-{{ act.estado }} px-2 py-1 rounded-pill">{{ act.get_estado_display }}</span></td>
+              <td><span class="badge bg-light text-dark">{{ act.evidencias.count }} <i class="bi bi-image"></i></span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted py-4">Sin actividades registradas</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Propuestas + Avisos -->
+  <div class="col-lg-5">
+    <!-- Propuestas Pendientes -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center bg-white">
+        <span><i class="bi bi-lightbulb-fill text-warning me-2"></i>Propuestas Pendientes</span>
+        <a href="{% url 'propuestas_lista' %}?estado=pendiente" class="btn btn-sm btn-outline-warning">Ver todas</a>
+      </div>
+      <div class="card-body p-0">
+        {% for p in propuestas_pendientes %}
+        <div class="d-flex align-items-center gap-3 px-3 py-2 border-bottom">
+          <div class="avatar-placeholder" style="width:34px;height:34px;font-size:.75rem;flex-shrink:0;">
+            {{ p.propuesta_por.first_name|first }}{{ p.propuesta_por.last_name|first }}
+          </div>
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-semibold text-truncate" style="font-size:.85rem;">{{ p.titulo }}</div>
+            <small class="text-muted">{{ p.propuesta_por.get_full_name }}</small>
+          </div>
+          <a href="{% url 'propuesta_revisar' p.pk %}" class="btn btn-xs btn-warning btn-sm py-1 px-2" style="font-size:.75rem;">Revisar</a>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-3"><i class="bi bi-check-circle text-success fs-4"></i><br><small>Sin propuestas pendientes</small></div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Excursiones Próximas -->
+    <div class="card">
+      <div class="card-header bg-white">
+        <i class="bi bi-map-fill text-info me-2"></i>Excursiones Próximas
+      </div>
+      <div class="card-body p-0">
+        {% for exc in excursiones_proximas %}
+        <div class="px-3 py-2 border-bottom">
+          <div class="fw-semibold" style="font-size:.875rem;">{{ exc.destino.nombre }}</div>
+          <small class="text-muted">{{ exc.seccion.nombre }} — {{ exc.fecha|date:"d/m/Y" }}</small>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-3"><small>Sin excursiones próximas</small></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

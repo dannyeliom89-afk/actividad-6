@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{{ mensaje.asunto }}{% endblock %}
+{% block page_title %}Leer Mensaje{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">{{ mensaje.asunto }}</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-2 mb-4 pb-3 border-bottom">
+          <div class="col-sm-6">
+            <div class="text-muted small">De</div>
+            <div class="fw-semibold">{{ mensaje.de_usuario.get_full_name|default:mensaje.de_usuario.username }}</div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small">Para</div>
+            <div class="fw-semibold">{{ mensaje.para_usuario.get_full_name|default:mensaje.para_usuario.username }}</div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small">Fecha</div>
+            <div class="fw-semibold">{{ mensaje.fecha_envio|date:"d/m/Y H:i" }}</div>
+          </div>
+          <div class="col-sm-6">
+            <div class="text-muted small">Estado</div>
+            <div>{% if mensaje.leido %}<span class="badge bg-success">Leído</span>{% else %}<span class="badge bg-warning">No leído</span>{% endif %}</div>
+          </div>
+        </div>
+        <div style="white-space:pre-wrap;">{{ mensaje.mensaje }}</div>
+        <div class="mt-4 d-flex gap-2">
+          <a href="{% url 'mensajes_bandeja' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+          </a>
+          <a href="{% url 'mensaje_enviar' %}?para={{ mensaje.de_usuario.pk }}" class="btn btn-primary">
+            <i class="bi bi-reply me-1"></i>Responder
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

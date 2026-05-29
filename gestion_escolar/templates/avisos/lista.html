@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Avisos{% endblock %}
+{% block page_title %}Avisos y Comunicados{% endblock %}
+{% block topbar_actions %}
+  {% if user.is_director %}
+  <a href="{% url 'aviso_crear' %}" class="btn btn-sm btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Nuevo Aviso
+  </a>
+  {% endif %}
+{% endblock %}
+{% block content %}
+<div class="row g-3">
+  {% for aviso in avisos %}
+  <div class="col-12">
+    <div class="card {% if aviso.es_urgente %}border-danger{% endif %}">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          {% if aviso.es_urgente %}
+          <span class="badge bg-danger rounded-pill">URGENTE</span>
+          {% else %}
+          <span class="badge bg-primary rounded-pill">Aviso</span>
+          {% endif %}
+          <h6 class="mb-0">{{ aviso.titulo }}</h6>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <small class="text-muted">{{ aviso.fecha_creacion|date:"d/m/Y H:i" }}</small>
+          {% if user.is_director %}
+          <form method="post" action="{% url 'aviso_eliminar' aviso.pk %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2"
+                    onclick="return confirm('¿Desactivar este aviso?')">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="mb-1">{{ aviso.mensaje }}</p>
+        <small class="text-muted">
+          <i class="bi bi-person me-1"></i>{{ aviso.creado_por.get_full_name|default:aviso.creado_por.username }}
+        </small>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12 text-center py-5 text-muted">
+    <i class="bi bi-megaphone fs-1 d-block mb-2"></i>
+    No hay avisos publicados actualmente.
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
