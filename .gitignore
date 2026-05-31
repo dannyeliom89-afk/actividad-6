@@ -1,0 +1,48 @@
+# =============================================
+# .gitignore para proyecto Django
+# =============================================
+
+# Variables de entorno (¡NUNCA subir al repositorio!)
+.env
+*.env
+.env.local
+.env.production
+
+# Base de datos SQLite local
+*.sqlite3
+db.sqlite3
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Entorno virtual
+venv/
+env/
+ENV/
+.venv/
+
+# Archivos de sistema Windows
+Thumbs.db
+desktop.ini
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Archivos estáticos generados
+staticfiles/
+static_root/
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.bak
+fix_templates.py
