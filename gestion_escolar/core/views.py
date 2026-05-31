@@ -634,3 +634,87 @@ def usuario_eliminar(request, pk):
         messages.success(request, f'Usuario {username} eliminado.')
         return redirect('usuarios_lista')
     return render(request, 'usuarios/confirmar_eliminar.html', {'usuario': usuario})
+
+
+# ─── Calendario de Actividades ────────────────────────────────────────────────
+
+import json
+import calendar as cal_module
+
+@login_required
+def calendario_actividades(request):
+    """Vista de calendario mostrando actividades institucionales por mes."""
+    from datetime import date
+    user = request.user
+
+    today = date.today()
+    year  = int(request.GET.get('year',  today.year))
+    month = int(request.GET.get('month', today.month))
+
+    # Navegar entre meses
+    if month < 1:
+        month = 12; year -= 1
+    elif month > 12:
+        month = 1; year += 1
+
+    # Obtener actividades del mes
+    if user.is_director:
+        actividades_qs = ActividadInstitucional.objects.filter(
+            fecha__year=year, fecha__month=month
+        ).select_related('created_by').prefetch_related('responsables')
+    else:
+        actividades_qs = ActividadInstitucional.objects.filter(
+            fecha__year=year, fecha__month=month, responsables=user
+        ).select_related('created_by').prefetch_related('responsables')
+
+    # Serializar para JavaScript
+    eventos = []
+    for a in actividades_qs:
+        eventos.append({
+            'id': a.pk,
+            'titulo': a.titulo,
+            'fecha': a.fecha.strftime('%Y-%m-%d'),
+            'estado': a.estado,
+            'lugar': a.lugar or '',
+            'url': '/actividades/{}/'.format(a.pk),
+        })
+
+    # Construir grilla preprocesada para el template
+    raw_cal = cal_module.monthcalendar(year, month)
+    grilla = []
+    for week in raw_cal:
+        fila = []
+        for day in week:
+            if day == 0:
+                fila.append({'empty': True, 'day': 0, 'date_str': '', 'is_today': False})
+            else:
+                ds = '{:04d}-{:02d}-{:02d}'.format(year, month, day)
+                is_t = (day == today.day and month == today.month and year == today.year)
+                fila.append({'empty': False, 'day': day, 'date_str': ds, 'is_today': is_t})
+        grilla.append(fila)
+
+    prev_month = month - 1 if month > 1 else 12
+    prev_year  = year if month > 1 else year - 1
+    next_month = month + 1 if month < 12 else 1
+    next_year  = year if month < 12 else year + 1
+
+    nombre_mes = [
+        '', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ][month]
+
+    return render(request, 'calendario/calendario.html', {
+        'eventos_json': json.dumps(eventos, ensure_ascii=False),
+        'year': year,
+        'month': month,
+        'nombre_mes': nombre_mes,
+        'grilla': grilla,
+        'today': today,
+        'prev_year': prev_year,
+        'prev_month': prev_month,
+        'next_year': next_year,
+        'next_month': next_month,
+        'actividades_mes': actividades_qs,
+    })
+
+

@@ -375,7 +375,7 @@ class RegistroDocenteForm(forms.ModelForm):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password1'])
         user.role = 'docente'
-        user.is_active = False  # Requiere aprobación del director
+        user.is_active = True  # Activación automática para facilitar pruebas
         if commit:
             user.save()
         return user

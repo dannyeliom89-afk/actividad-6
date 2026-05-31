@@ -1,0 +1,360 @@
+{% extends "base.html" %}
+{% block title %}Calendario de Actividades{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cal-header {
+        background: linear-gradient(135deg, #1a237e, #3949ab);
+        border-radius: 1rem 1rem 0 0;
+        padding: 1.25rem 1.5rem;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .cal-header h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .cal-nav-btn {
+        background: rgba(255, 255, 255, 0.15);
+        border: none;
+        color: #fff;
+        border-radius: .5rem;
+        width: 38px;
+        height: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        transition: background .2s;
+        text-decoration: none;
+    }
+
+    .cal-nav-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        color: #fff;
+    }
+
+    .cal-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        background: #e8eaf6;
+        border-left: 1px solid #e0e0e0;
+        border-right: 1px solid #e0e0e0;
+    }
+
+    .cal-weekday {
+        text-align: center;
+        padding: .5rem 0;
+        font-size: .7rem;
+        font-weight: 700;
+        color: #5c6bc0;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
+
+    .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        border-left: 1px solid #e8eaf6;
+        border-top: 1px solid #e8eaf6;
+        border-radius: 0 0 1rem 1rem;
+        overflow: hidden;
+    }
+
+    .cal-cell {
+        min-height: 100px;
+        border-right: 1px solid #e8eaf6;
+        border-bottom: 1px solid #e8eaf6;
+        padding: .4rem .5rem;
+        background: #fff;
+        position: relative;
+        transition: background .15s;
+    }
+
+    .cal-cell:hover {
+        background: #f5f7ff;
+    }
+
+    .cal-cell.empty {
+        background: #f8f9fc;
+    }
+
+    .cal-cell.today {
+        background: #e8f5e9;
+    }
+
+    .cal-cell.today .cal-day-num {
+        background: #1a237e;
+        color: #fff;
+    }
+
+    .cal-day-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        font-size: .82rem;
+        font-weight: 600;
+        color: #424242;
+        margin-bottom: .25rem;
+    }
+
+    .cal-evento {
+        display: block;
+        font-size: .68rem;
+        font-weight: 600;
+        border-radius: .3rem;
+        padding: .15rem .35rem;
+        margin-bottom: .2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-decoration: none;
+        transition: filter .15s;
+    }
+
+    .cal-evento:hover {
+        filter: brightness(.88);
+        color: inherit;
+    }
+
+    .cal-evento.pendiente {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    .cal-evento.en_proceso {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+    .cal-evento.finalizada {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .cal-evento.cancelada {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .cal-side {
+        position: sticky;
+        top: 80px;
+    }
+
+    .cal-side .card-header {
+        background: linear-gradient(135deg, #1a237e, #3949ab);
+        color: #fff;
+        border-radius: 1rem 1rem 0 0 !important;
+        font-size: .9rem;
+    }
+
+    .act-item {
+        display: flex;
+        gap: .75rem;
+        align-items: flex-start;
+        padding: .7rem 0;
+        border-bottom: 1px solid #f0f2f8;
+        text-decoration: none;
+        color: inherit;
+        transition: background .15s;
+    }
+
+    .act-item:last-child {
+        border-bottom: none;
+    }
+
+    .act-item:hover {
+        color: #1a237e;
+    }
+
+    .act-date-badge {
+        min-width: 44px;
+        text-align: center;
+        background: #e8eaf6;
+        border-radius: .5rem;
+        padding: .3rem .4rem;
+        line-height: 1.1;
+    }
+
+    .act-date-badge .day {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1a237e;
+    }
+
+    .act-date-badge .mon {
+        font-size: .6rem;
+        font-weight: 600;
+        color: #5c6bc0;
+        text-transform: uppercase;
+    }
+
+    .act-title {
+        font-size: .82rem;
+        font-weight: 600;
+        line-height: 1.3;
+        margin-bottom: .2rem;
+    }
+
+    .act-lugar {
+        font-size: .72rem;
+        color: #757575;
+    }
+
+    .legend-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: .35rem;
+    }
+
+    @media (max-width:991px) {
+        .cal-cell {
+            min-height: 70px;
+        }
+
+        .cal-evento {
+            display: none;
+        }
+
+        .cal-cell.has-events::after {
+            content: '●';
+            font-size: .6rem;
+            color: #3949ab;
+            display: block;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block page_title %}📅 Calendario de Actividades{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm" style="border-radius:1rem;overflow:visible;">
+            <div class="cal-header">
+                <a href="?year={{ prev_year }}&month={{ prev_month }}" class="cal-nav-btn" title="Mes anterior">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+                <div class="text-center">
+                    <h2>{{ nombre_mes }} {{ year }}</h2>
+                    <div style="font-size:.78rem;opacity:.75;">{{ actividades_mes|length }} actividad{{ actividades_mes|length|pluralize:"es" }} este mes</div>
+                </div>
+                <a href="?year={{ next_year }}&month={{ next_month }}" class="cal-nav-btn" title="Mes siguiente">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </div>
+
+            <div class="cal-weekdays">
+                <div class="cal-weekday">Lun</div>
+                <div class="cal-weekday">Mar</div>
+                <div class="cal-weekday">Mié</div>
+                <div class="cal-weekday">Jue</div>
+                <div class="cal-weekday">Vie</div>
+                <div class="cal-weekday">Sáb</div>
+                <div class="cal-weekday">Dom</div>
+            </div>
+
+            <div class="cal-grid">
+                {% for semana in grilla %}
+                {% for celda in semana %}
+                {% if celda.empty %}
+                <div class="cal-cell empty"></div>
+                {% else %}
+                <div class="cal-cell {% if celda.is_today %}today{% endif %}" data-day="{{ celda.date_str }}">
+                    <span class="cal-day-num">{{ celda.day }}</span>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex flex-wrap gap-3" style="font-size:.78rem;">
+            <span><span class="legend-dot" style="background:#e65100;"></span>Pendiente</span>
+            <span><span class="legend-dot" style="background:#1565c0;"></span>En Proceso</span>
+            <span><span class="legend-dot" style="background:#2e7d32;"></span>Finalizada</span>
+            <span><span class="legend-dot" style="background:#c62828;"></span>Cancelada</span>
+            <span><span class="legend-dot" style="background:#1a237e;"></span>Hoy</span>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="cal-side">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex align-items-center gap-2">
+                    <i class="bi bi-list-task"></i>
+                    <span>Actividades de {{ nombre_mes }}</span>
+                </div>
+                <div class="card-body p-3">
+                    {% if actividades_mes %}
+                    {% for a in actividades_mes %}
+                    <a href="{% url 'actividad_detalle' a.pk %}" class="act-item">
+                        <div class="act-date-badge">
+                            <div class="day">{{ a.fecha|date:"d" }}</div>
+                            <div class="mon">{{ a.fecha|date:"M" }}</div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="act-title">{{ a.titulo }}</div>
+                            {% if a.lugar %}
+                            <div class="act-lugar"><i class="bi bi-geo-alt" style="font-size:.65rem;"></i> {{ a.lugar }}
+                            </div>
+                            {% endif %}
+                            <span class="badge badge-{{ a.estado }} mt-1" style="font-size:.63rem;">{{ a.get_estado_display }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-calendar-x" style="font-size:2rem;opacity:.35;"></i>
+                        <p class="mt-2 mb-0" style="font-size:.85rem;">No hay actividades este mes.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if year != today.year or month != today.month %}
+            <div class="mt-2 text-center">
+                <a href="?year={{ today.year }}&month={{ today.month }}" class="btn btn-sm btn-outline-primary w-100">
+                    <i class="bi bi-calendar-check me-1"></i> Ir al mes actual
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const eventos = {{ eventos_json| safe }};
+    const colores = {
+        pendiente: 'pendiente',
+        en_proceso: 'en_proceso',
+        finalizada: 'finalizada',
+        cancelada: 'cancelada'
+    };
+    eventos.forEach(ev => {
+        const cell = document.querySelector('.cal-cell[data-day="' + ev.fecha + '"]');
+        if (!cell) return;
+        cell.classList.add('has-events');
+        const chip = document.createElement('a');
+        chip.href = ev.url;
+        chip.className = 'cal-evento ' + (colores[ev.estado] || '');
+        chip.title = ev.titulo + (ev.lugar ? ' — ' + ev.lugar : '');
+        chip.textContent = ev.titulo;
+        cell.appendChild(chip);
+    });
+}) ();
+</script>
+{% endblock %}

@@ -49,6 +49,9 @@ urlpatterns = [
     path('mensajes/nuevo/', views.mensaje_enviar, name='mensaje_enviar'),
     path('mensajes/<int:pk>/', views.mensaje_leer, name='mensaje_leer'),
 
+    # Calendario
+    path('calendario/', views.calendario_actividades, name='calendario_actividades'),
+
     # Reportes
     path('reportes/', views.reportes_panel, name='reportes_panel'),
     path('reportes/pdf/', views.reporte_general_pdf, name='reporte_general_pdf'),
@@ -65,4 +68,5 @@ urlpatterns = [
     # Config
     path('config/secciones/', views.secciones_lista, name='secciones_lista'),
     path('config/destinos/', views.destinos_lista, name='destinos_lista'),
+
 ]
