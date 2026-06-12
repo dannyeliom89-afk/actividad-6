@@ -2,12 +2,36 @@
 {% block title %}Usuarios{% endblock %}
 {% block page_title %}Directorio de Usuarios{% endblock %}
 {% block topbar_actions %}
-  <a href="{% url 'usuario_crear' %}" class="btn btn-sm btn-primary">
-    <i class="bi bi-person-plus-fill me-1"></i>Nuevo Usuario
-  </a>
+<a href="{% url 'usuario_crear' %}" class="btn btn-sm btn-primary">
+  <i class="bi bi-person-plus-fill me-1"></i>Nuevo Usuario
+</a>
 {% endblock %}
 
 {% block content %}
+
+{# ── Alerta de cuentas pendientes ─────────────────────────────── #}
+{% with pendientes=usuarios|length %}
+{% with count_pendientes=0 %}
+{% for u in usuarios %}{% if not u.is_active %}
+{# contamos en el header la primera vez #}
+{% endif %}{% endfor %}
+{% endwith %}
+{% endwith %}
+
+{# Bloque de alerta pendientes #}
+{% regroup usuarios by is_active as grupos_estado %}
+{% for grupo in grupos_estado %}
+{% if not grupo.grouper %}
+<div class="alert alert-warning d-flex align-items-center gap-2 mb-3" style="border-radius:.9rem;">
+  <i class="bi bi-person-exclamation fs-4"></i>
+  <div>
+    <strong>Hay {{ grupo.list|length }} solicitud(es) pendiente(s) de aprobación.</strong>
+    Revisa la tabla y aprueba o rechaza las cuentas de los docentes que se registraron.
+  </div>
+</div>
+{% endif %}
+{% endfor %}
+
 <div class="card">
   <div class="card-body p-0">
     <div class="table-responsive">
@@ -24,59 +48,82 @@
         </thead>
         <tbody>
           {% for u in usuarios %}
-          <tr {% if not u.is_active %}class="table-warning"{% endif %}>
+          <tr {% if not u.is_active %}class="table-warning" {% endif %}>
             <td><small class="text-muted">#{{ u.id }}</small></td>
             <td>
               <div class="d-flex align-items-center">
                 {% if u.foto_perfil %}
-                  <img src="{{ u.foto_perfil.url }}" class="rounded-circle me-2" width="30" height="30" style="object-fit:cover;">
+                <img src="{{ u.foto_perfil.url }}" class="rounded-circle me-2" width="32" height="32"
+                  style="object-fit:cover;">
                 {% else %}
-                  <i class="bi bi-person-circle fs-3 text-secondary me-2"></i>
+                <i class="bi bi-person-circle fs-3 text-secondary me-2"></i>
                 {% endif %}
                 <div>
                   <span class="fw-semibold">{{ u.username }}</span>
                   {% if u.get_full_name %}<br><small class="text-muted">{{ u.get_full_name }}</small>{% endif %}
+                  {% if u.email %}<br><small class="text-muted">{{ u.email }}</small>{% endif %}
                 </div>
               </div>
             </td>
             <td>
               <span class="badge {% if u.role == 'director' %}bg-primary{% else %}bg-info text-dark{% endif %}">
+                <i class="bi {% if u.role == 'director' %}bi-shield-fill{% else %}bi-person-fill{% endif %} me-1"></i>
                 {{ u.get_role_display }}
               </span>
             </td>
             <td>
               {% if u.is_active %}
-                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Activo</span>
+              <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Activo</span>
               {% else %}
-                <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>Pendiente</span>
+              <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split me-1"></i>Pendiente
+                aprobación</span>
               {% endif %}
             </td>
             <td>
               {% if u.last_login %}
-                <small class="text-muted">Hace {{ u.last_login|timesince }}</small>
+              <small class="text-muted">Hace {{ u.last_login|timesince }}</small>
               {% else %}
-                <span class="badge bg-secondary">Nunca</span>
+              <span class="badge bg-secondary">Nunca</span>
               {% endif %}
             </td>
             <td>
-              <div class="d-flex gap-1 flex-wrap">
+              <div class="d-flex gap-1 flex-wrap align-items-center">
+
+                {# ── Botones solo para cuentas PENDIENTES ── #}
                 {% if not u.is_active %}
-                  <form method="post" action="{% url 'usuario_editar' u.pk %}" style="display:inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="is_active" value="True">
-                    <a href="{% url 'usuario_editar' u.pk %}" class="btn btn-sm btn-success" title="Aprobar cuenta">
-                      <i class="bi bi-person-check-fill me-1"></i>Aprobar
-                    </a>
-                  </form>
+                {# Botón Aprobar #}
+                <form method="post" action="{% url 'aprobar_usuario' u.pk %}" style="display:inline;"
+                  onsubmit="return confirm('¿Aprobar la cuenta de {{ u.get_full_name|default:u.username }}? Podrá iniciar sesión al sistema.');">
+                  {% csrf_token %}
+                  <input type="hidden" name="accion" value="aprobar">
+                  <button type="submit" class="btn btn-sm btn-success" title="Aprobar cuenta">
+                    <i class="bi bi-person-check-fill me-1"></i>Aprobar
+                  </button>
+                </form>
+
+                {# Botón Rechazar #}
+                <form method="post" action="{% url 'aprobar_usuario' u.pk %}" style="display:inline;"
+                  onsubmit="return confirm('¿RECHAZAR y ELIMINAR la cuenta de {{ u.get_full_name|default:u.username }}? Esta acción no se puede deshacer.');">
+                  {% csrf_token %}
+                  <input type="hidden" name="accion" value="rechazar">
+                  <button type="submit" class="btn btn-sm btn-danger" title="Rechazar y eliminar cuenta">
+                    <i class="bi bi-person-x-fill me-1"></i>Rechazar
+                  </button>
+                </form>
                 {% endif %}
+
+                {# Botón Ver/Editar siempre visible #}
                 <a href="{% url 'usuario_editar' u.pk %}" class="btn btn-sm btn-light" title="Ver detalles / Editar">
-                  <i class="bi bi-eye-fill text-primary"></i> Ver
+                  <i class="bi bi-pencil-fill text-primary"></i> Editar
                 </a>
+
               </div>
             </td>
           </tr>
           {% empty %}
-          <tr><td colspan="6" class="text-center text-muted py-4">No hay usuarios registrados.</td></tr>
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">No hay usuarios registrados.</td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>

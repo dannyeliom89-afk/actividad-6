@@ -1,40 +1,109 @@
 {% extends 'base.html' %}
 {% block title %}Nuevo Aviso{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+  .select2-container--default .select2-selection--multiple {
+    border-color: #dee2e6;
+    min-height: 45px;
+    border-radius: 0.5rem;
+  }
+
+  .select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-color: #1a237e;
+    box-shadow: 0 0 0 0.25rem rgba(26, 35, 126, 0.25);
+  }
+
+  /* Estilo etiquetas compactas con hover */
+  .select2-selection__choice {
+    background-color: #f1f3f5 !important;
+    border: 1px solid #ced4da !important;
+    color: #1a237e !important;
+    border-radius: 4px !important;
+    padding: 0 8px !important;
+    margin: 2px 4px 2px 0 !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    display: inline-flex !important;
+    flex-direction: row-reverse !important;
+    align-items: center !important;
+    gap: 0px !important;
+    height: 24px !important;
+    transition: all 0.2s !important;
+    cursor: pointer;
+  }
+
+  .select2-selection__choice__remove {
+    color: #dc3545 !important;
+    margin: 0 !important;
+    border: none !important;
+    font-weight: bold !important;
+    font-size: 1rem !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    transition: all 0.2s ease !important;
+  }
+
+  .select2-selection__choice:hover {
+    padding-right: 6px !important;
+    gap: 6px !important;
+    background-color: #ffebee !important;
+  }
+
+  .select2-selection__choice:hover .select2-selection__choice__remove {
+    opacity: 1;
+    width: auto;
+  }
+</style>
+{% endblock %}
+
 {% block page_title %}Crear Aviso{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-lg-7">
-    <div class="card">
-      <div class="card-header bg-white">
-        <i class="bi bi-megaphone-fill text-danger me-2"></i>Crear Aviso/Comunicado
+    <div class="card shadow-sm">
+      <div class="card-header bg-white py-3">
+        <i class="bi bi-megaphone-fill text-danger me-2"></i><b>Crear Aviso/Comunicado</b>
       </div>
-      <div class="card-body">
-        <form method="post">
+      <div class="card-body p-4">
+        <form method="post" id="avisoForm">
           {% csrf_token %}
+
           <div class="mb-3">
-            <label class="form-label fw-semibold">Título <span class="text-danger">*</span></label>
+            <label class="form-label fw-bold">Título <span class="text-danger">*</span></label>
             {{ form.titulo }}
           </div>
+
           <div class="mb-3">
-            <label class="form-label fw-semibold">Mensaje <span class="text-danger">*</span></label>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="form-label fw-bold mb-0">Destinatarios</label>
+              <button type="button" class="btn btn-xs btn-outline-primary" id="selectAllBtn"
+                style="font-size: 0.72rem; padding: 1px 7px;">
+                <i class="bi bi-people-fill me-1"></i>Seleccionar todos
+              </button>
+            </div>
+            {{ form.destinatarios }}
+            <small class="text-muted">Si lo dejas vacío, el aviso será visible para todos los docentes.</small>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-bold">Mensaje <span class="text-danger">*</span></label>
             {{ form.mensaje }}
           </div>
-          <div class="mb-3">
-            <label class="form-label fw-semibold">Destinatarios específicos</label>
-            <div class="border rounded p-3" style="max-height:200px;overflow-y:auto;">
-              {% for checkbox in form.destinatarios %}
-              <div class="form-check">{{ checkbox }}</div>
-              {% endfor %}
-            </div>
-            <small class="text-muted">Deja vacío para enviar a todos los docentes.</small>
-          </div>
-          <div class="mb-4 form-check">
+
+          <div class="mb-4 form-check p-0 d-flex align-items-center gap-2">
             {{ form.es_urgente }}
-            <label class="form-check-label fw-semibold text-danger">Marcar como urgente</label>
+            <label class="form-check-label fw-bold text-danger">Marcar como comunicado URGENTE</label>
           </div>
-          <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-send me-1"></i>Publicar Aviso
+
+          <div class="d-flex gap-2 border-top pt-3">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="bi bi-send-fill me-1"></i>Publicar Aviso
             </button>
             <a href="{% url 'avisos_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
           </div>
@@ -43,4 +112,26 @@
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  $(document).ready(function () {
+    const selectDest = $('.select2-multiple').select2({
+      placeholder: "Buscar docentes...",
+      allowClear: true,
+      width: '100%'
+    });
+
+    $('#selectAllBtn').click(function () {
+      const allValue = [];
+      $('.select2-multiple option').each(function () {
+        allValue.push($(this).val());
+      });
+      selectDest.val(allValue).trigger('change');
+    });
+  });
+</script>
 {% endblock %}

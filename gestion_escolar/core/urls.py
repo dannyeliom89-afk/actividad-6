@@ -51,6 +51,7 @@ urlpatterns = [
 
     # Calendario
     path('calendario/', views.calendario_actividades, name='calendario_actividades'),
+    path('calendario/api/', views.calendario_api, name='calendario_api'),
 
     # Reportes
     path('reportes/', views.reportes_panel, name='reportes_panel'),
@@ -64,9 +65,13 @@ urlpatterns = [
     path('usuarios/nuevo/', views.usuario_crear, name='usuario_crear'),
     path('usuarios/<int:pk>/editar/', views.usuario_editar, name='usuario_editar'),
     path('usuarios/<int:pk>/eliminar/', views.usuario_eliminar, name='usuario_eliminar'),
+    path('usuarios/<int:pk>/aprobar/', views.aprobar_usuario, name='aprobar_usuario'),
 
     # Config
     path('config/secciones/', views.secciones_lista, name='secciones_lista'),
     path('config/destinos/', views.destinos_lista, name='destinos_lista'),
+
+    # Chatbot
+    path('chatbot/api/', views.chatbot_api, name='chatbot_api'),
 
 ]

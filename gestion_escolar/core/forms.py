@@ -39,12 +39,13 @@ class ActividadForm(forms.ModelForm):
 
     class Meta:
         model = ActividadInstitucional
-        fields = ['titulo', 'descripcion', 'fecha', 'lugar', 'estado']
+        fields = ['titulo', 'descripcion', 'fecha', 'lugar', 'estado', 'imagen']
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título de la actividad'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Descripción detallada'}),
             'lugar': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lugar de la actividad'}),
             'estado': forms.Select(attrs={'class': 'form-select'}),
+            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
         }
         labels = {
             'titulo': 'Título',
@@ -106,13 +107,14 @@ class ExcursionForm(forms.ModelForm):
 
     class Meta:
         model = Excursion
-        fields = ['seccion', 'destino', 'fecha', 'descripcion', 'num_estudiantes', 'estado']
+        fields = ['seccion', 'destino', 'fecha', 'descripcion', 'num_estudiantes', 'estado', 'imagen']
         widgets = {
             'seccion': forms.Select(attrs={'class': 'form-select'}),
             'destino': forms.Select(attrs={'class': 'form-select'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'num_estudiantes': forms.NumberInput(attrs={'class': 'form-control'}),
             'estado': forms.Select(attrs={'class': 'form-select'}),
+            'imagen': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
         }
         labels = {
             'seccion': 'Sección',
@@ -142,7 +144,7 @@ class AvisoForm(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título del aviso'}),
             'mensaje': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Contenido del aviso...'}),
-            'destinatarios': forms.CheckboxSelectMultiple(),
+            'destinatarios': forms.SelectMultiple(attrs={'class': 'form-select select2-multiple'}),
             'es_urgente': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {
@@ -158,27 +160,28 @@ class AvisoForm(forms.ModelForm):
         self.fields['destinatarios'].required = False
 
 
-class MensajeForm(forms.ModelForm):
-    """Formulario para enviar mensajes internos."""
-    class Meta:
-        model = Mensaje
-        fields = ['para_usuario', 'asunto', 'mensaje']
-        widgets = {
-            'para_usuario': forms.Select(attrs={'class': 'form-select'}),
-            'asunto': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Asunto del mensaje'}),
-            'mensaje': forms.Textarea(attrs={'class': 'form-control', 'rows': 6, 'placeholder': 'Escribe tu mensaje aquí...'}),
-        }
-        labels = {
-            'para_usuario': 'Destinatario',
-            'asunto': 'Asunto',
-            'mensaje': 'Mensaje',
-        }
+class MensajeForm(forms.Form):
+    """Formulario para enviar mensajes internos a uno o varios destinatarios."""
+    destinatarios = forms.ModelMultipleChoiceField(
+        queryset=User.objects.none(),
+        label="Destinatarios",
+        widget=forms.SelectMultiple(attrs={'class': 'form-select select2-multiple', 'style': 'width: 100%'})
+    )
+    asunto = forms.CharField(
+        max_length=300,
+        label="Asunto",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Asunto del mensaje'})
+    )
+    mensaje = forms.CharField(
+        label="Mensaje",
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 6, 'placeholder': 'Escribe tu mensaje aquí...'})
+    )
 
     def __init__(self, *args, **kwargs):
         current_user = kwargs.pop('current_user', None)
         super().__init__(*args, **kwargs)
         if current_user:
-            self.fields['para_usuario'].queryset = User.objects.filter(is_active=True).exclude(pk=current_user.pk)
+            self.fields['destinatarios'].queryset = User.objects.filter(is_active=True).exclude(pk=current_user.pk)
 
 
 class PerfilForm(forms.ModelForm):
@@ -375,7 +378,7 @@ class RegistroDocenteForm(forms.ModelForm):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password1'])
         user.role = 'docente'
-        user.is_active = True  # Activación automática para facilitar pruebas
+        user.is_active = False  # Cuenta inactiva hasta que el director la apruebe
         if commit:
             user.save()
         return user

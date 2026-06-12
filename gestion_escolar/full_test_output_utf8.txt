@@ -1,0 +1,45 @@
+﻿PASS - Login Director (director/admin1234) (status=302)
+PASS - Login Docente1 (docente1/docente1234) (status=302)
+PASS - Dashboard Director carga OK (status=200)
+PASS - Dashboard Docente carga OK (status=200)
+PASS - Actividades - Lista carga OK
+FAIL - Actividad - Detalle con formulario de evidencia (form_evidencia=NO ENCONTRADO)
+PASS - Actividad - Crear nueva (director) (status=302)
+PASS - Propuestas - Lista carga OK (director)
+PASS - Propuesta - Crear nueva (docente) (status=302)
+PASS - Propuesta - Revisar/Aprobar #9 (status=302)
+PASS - Propuesta - Notificacion de mensaje enviada al docente
+PASS - Excursiones - Lista carga OK
+PASS - Excursion - Crear nueva (status=302)
+FAIL - Excursion - Detalle con formulario de evidencia (form=NO)
+PASS - Mensajes - Bandeja carga OK
+PASS - Mensajes - Enviar nuevo mensaje (status=302)
+PASS - Usuarios - Lista carga OK
+PASS - Usuarios - Crear nuevo usuario (status=302)
+PASS - Calendario - Vista carga OK
+PASS - Avisos - Lista carga OK
+PASS - Avisos - Crear nuevo aviso (status=302)
+PASS - Reportes - Panel carga OK
+PASS - Reportes - PDF generado (content-type=application/pdf)
+PASS - Actividad - PDF individual generado
+PASS - Perfil - Vista carga OK
+PASS - Config - Secciones carga OK
+PASS - Config - Destinos carga OK
+PASS - Seguridad - Docente NO puede crear actividad (status=302 (debe ser 302 redirect))
+PASS - Seguridad - Docente NO puede ver usuarios (status=302)
+
+============================================================
+RESUMEN FINAL
+============================================================
+APROBADAS: 27/29
+FALLIDAS:  2/29
+============================================================
+
+ESTADO DE LA BASE DE DATOS:
+  Usuarios:          12
+  Actividades:       10
+  Propuestas:        7
+  Excursiones:       10
+  Evidencias subidas:0
+  Mensajes:          12
+  Avisos activos:    5

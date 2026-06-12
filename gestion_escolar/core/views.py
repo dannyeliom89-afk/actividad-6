@@ -5,9 +5,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from django.utils import timezone
 from django.db.models import Q, Count
+import json
+import google.generativeai as genai
+from django.conf import settings
 from .models import (
     User, Seccion, Destino, ActividadInstitucional,
     PropuestaActividad, Excursion, Evidencia, Aviso, Mensaje
@@ -100,6 +103,7 @@ def dashboard(request):
         propuestas_pendientes = PropuestaActividad.objects.filter(estado='pendiente')
         excursiones = Excursion.objects.all().select_related('seccion', 'destino', 'responsable')
         docentes = User.objects.filter(role='docente', is_active=True)
+        docentes_pendientes = User.objects.filter(role='docente', is_active=False).count()
         stats = {
             'total_actividades': actividades.count(),
             'actividades_pendientes': actividades.filter(estado='pendiente').count(),
@@ -108,6 +112,7 @@ def dashboard(request):
             'propuestas_pendientes': propuestas_pendientes.count(),
             'total_excursiones': excursiones.count(),
             'total_docentes': docentes.count(),
+            'docentes_pendientes': docentes_pendientes,
             'mensajes_no_leidos': mensajes_no_leidos,
         }
         ctx = {
@@ -176,13 +181,16 @@ def actividades_lista(request):
 
 @director_required
 def actividad_crear(request):
-    form = ActividadForm(request.POST or None)
+    form = ActividadForm(request.POST or None, request.FILES or None)
     if request.method == 'POST' and form.is_valid():
         actividad = form.save(commit=False)
         actividad.created_by = request.user
         actividad.save()
-        messages.success(request, f'Actividad "{actividad.titulo}" creada exitosamente.')
-        return redirect('actividad_detalle', pk=actividad.pk)
+        messages.success(request, f'Actividad "{actividad.titulo}" creada exitosamente. Ya aparece en el calendario.')
+        # Redirigir al calendario en el mes de la actividad
+        return redirect(
+            f"/calendario/?year={actividad.fecha.year}&month={actividad.fecha.month}"
+        )
     return render(request, 'actividades/form.html', {'form': form, 'titulo': 'Nueva Actividad'})
 
 
@@ -206,11 +214,14 @@ def actividad_detalle(request, pk):
 @director_required
 def actividad_editar(request, pk):
     actividad = get_object_or_404(ActividadInstitucional, pk=pk)
-    form = ActividadForm(request.POST or None, instance=actividad)
+    form = ActividadForm(request.POST or None, request.FILES or None, instance=actividad)
     if request.method == 'POST' and form.is_valid():
-        form.save()
-        messages.success(request, 'Actividad actualizada correctamente.')
-        return redirect('actividad_detalle', pk=actividad.pk)
+        actividad = form.save()
+        messages.success(request, 'Actividad actualizada correctamente. El calendario refleja el cambio.')
+        # Redirigir al calendario en el mes de la actividad
+        return redirect(
+            f"/calendario/?year={actividad.fecha.year}&month={actividad.fecha.month}"
+        )
     return render(request, 'actividades/form.html', {
         'form': form,
         'titulo': 'Editar Actividad',
@@ -324,7 +335,7 @@ def excursiones_lista(request):
 
 @login_required
 def excursion_crear(request):
-    form = ExcursionForm(request.POST or None)
+    form = ExcursionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST' and form.is_valid():
         excursion = form.save(commit=False)
         excursion.responsable = request.user
@@ -357,7 +368,7 @@ def excursion_editar(request, pk):
         excursion = get_object_or_404(Excursion, pk=pk)
     else:
         excursion = get_object_or_404(Excursion, pk=pk, responsable=user)
-    form = ExcursionForm(request.POST or None, instance=excursion)
+    form = ExcursionForm(request.POST or None, request.FILES or None, instance=excursion)
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, 'Excursión actualizada correctamente.')
@@ -389,12 +400,10 @@ def evidencia_subir_actividad(request, pk):
     else:
         actividad = get_object_or_404(ActividadInstitucional, pk=pk, responsables=user)
     if request.method == 'POST':
-        form = EvidenciaForm(request.POST, request.FILES)
+        evidencia_instance = Evidencia(actividad=actividad, subido_por=request.user)
+        form = EvidenciaForm(request.POST, request.FILES, instance=evidencia_instance)
         if form.is_valid():
-            evidencia = form.save(commit=False)
-            evidencia.actividad = actividad
-            evidencia.subido_por = request.user
-            evidencia.save()
+            form.save()
             messages.success(request, 'Evidencia subida exitosamente.')
         else:
             messages.error(request, 'Error al subir la evidencia. Verifica el archivo.')
@@ -409,12 +418,10 @@ def evidencia_subir_excursion(request, pk):
     else:
         excursion = get_object_or_404(Excursion, pk=pk, responsable=user)
     if request.method == 'POST':
-        form = EvidenciaForm(request.POST, request.FILES)
+        evidencia_instance = Evidencia(excursion=excursion, subido_por=request.user)
+        form = EvidenciaForm(request.POST, request.FILES, instance=evidencia_instance)
         if form.is_valid():
-            evidencia = form.save(commit=False)
-            evidencia.excursion = excursion
-            evidencia.subido_por = request.user
-            evidencia.save()
+            form.save()
             messages.success(request, 'Evidencia subida exitosamente.')
         else:
             messages.error(request, 'Error al subir la evidencia.')
@@ -492,10 +499,20 @@ def mensajes_bandeja(request):
 def mensaje_enviar(request):
     form = MensajeForm(request.POST or None, current_user=request.user)
     if request.method == 'POST' and form.is_valid():
-        msg = form.save(commit=False)
-        msg.de_usuario = request.user
-        msg.save()
-        messages.success(request, f'Mensaje enviado a {msg.para_usuario.get_full_name() or msg.para_usuario.username}.')
+        destinatarios = form.cleaned_data['destinatarios']
+        asunto = form.cleaned_data['asunto']
+        cuerpo = form.cleaned_data['mensaje']
+        
+        # Crear un mensaje para cada destinatario seleccionado
+        for dep in destinatarios:
+            Mensaje.objects.create(
+                de_usuario=request.user,
+                para_usuario=dep,
+                asunto=asunto,
+                mensaje=cuerpo
+            )
+            
+        messages.success(request, f'Mensaje enviado correctamente a {destinatarios.count()} destinatario(s).')
         return redirect('mensajes_bandeja')
     return render(request, 'mensajes/enviar.html', {'form': form})
 
@@ -636,6 +653,26 @@ def usuario_eliminar(request, pk):
     return render(request, 'usuarios/confirmar_eliminar.html', {'usuario': usuario})
 
 
+@director_required
+def aprobar_usuario(request, pk):
+    """Vista para que el director apruebe o rechace una cuenta de docente pendiente."""
+    usuario = get_object_or_404(User, pk=pk)
+    if request.method == 'POST':
+        accion = request.POST.get('accion')
+        if accion == 'aprobar':
+            usuario.is_active = True
+            usuario.save()
+            messages.success(
+                request,
+                f'✅ Cuenta de {usuario.get_full_name() or usuario.username} aprobada. El docente ya puede iniciar sesión.'
+            )
+        elif accion == 'rechazar':
+            nombre = usuario.get_full_name() or usuario.username
+            usuario.delete()
+            messages.warning(request, f'❌ Cuenta de {nombre} rechazada y eliminada del sistema.')
+    return redirect('usuarios_lista')
+
+
 # ─── Calendario de Actividades ────────────────────────────────────────────────
 
 import json
@@ -657,15 +694,10 @@ def calendario_actividades(request):
     elif month > 12:
         month = 1; year += 1
 
-    # Obtener actividades del mes
-    if user.is_director:
-        actividades_qs = ActividadInstitucional.objects.filter(
-            fecha__year=year, fecha__month=month
-        ).select_related('created_by').prefetch_related('responsables')
-    else:
-        actividades_qs = ActividadInstitucional.objects.filter(
-            fecha__year=year, fecha__month=month, responsables=user
-        ).select_related('created_by').prefetch_related('responsables')
+    # Todas las actividades institucionales del mes para todos los usuarios
+    actividades_qs = ActividadInstitucional.objects.filter(
+        fecha__year=year, fecha__month=month
+    ).select_related('created_by').prefetch_related('responsables')
 
     # Serializar para JavaScript
     eventos = []
@@ -686,11 +718,19 @@ def calendario_actividades(request):
         fila = []
         for day in week:
             if day == 0:
-                fila.append({'empty': True, 'day': 0, 'date_str': '', 'is_today': False})
+                fila.append({'empty': True, 'day': 0, 'date_str': '', 'is_today': False, 'eventos': []})
             else:
                 ds = '{:04d}-{:02d}-{:02d}'.format(year, month, day)
                 is_t = (day == today.day and month == today.month and year == today.year)
-                fila.append({'empty': False, 'day': day, 'date_str': ds, 'is_today': is_t})
+                # Filtrar eventos del día para la celda
+                eventos_dia = [e for e in eventos if e['fecha'] == ds]
+                fila.append({
+                    'empty': False, 
+                    'day': day, 
+                    'date_str': ds, 
+                    'is_today': is_t,
+                    'eventos': eventos_dia
+                })
         grilla.append(fila)
 
     prev_month = month - 1 if month > 1 else 12
@@ -718,3 +758,68 @@ def calendario_actividades(request):
     })
 
 
+@login_required
+def calendario_api(request):
+    """API JSON que devuelve las actividades del mes para polling AJAX del calendario."""
+    from datetime import date
+    user = request.user
+    today = date.today()
+    year  = int(request.GET.get('year',  today.year))
+    month = int(request.GET.get('month', today.month))
+
+    if month < 1:
+        month = 12; year -= 1
+    elif month > 12:
+        month = 1; year += 1
+
+    # Todas las actividades institucionales del mes para todos los usuarios
+    actividades_qs = ActividadInstitucional.objects.filter(
+        fecha__year=year, fecha__month=month
+    ).select_related('created_by')
+
+    eventos = []
+    for a in actividades_qs:
+        eventos.append({
+            'id': a.pk,
+            'titulo': a.titulo,
+            'fecha': a.fecha.strftime('%Y-%m-%d'),
+            'estado': a.estado,
+            'lugar': a.lugar or '',
+            'url': '/actividades/{}/'.format(a.pk),
+        })
+
+    return JsonResponse({
+        'eventos': eventos,
+        'total': len(eventos),
+        'year': year,
+        'month': month,
+    })
+
+
+@login_required
+def chatbot_api(request):
+    """API Endpoint para el Chatbot Gemini."""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user_message = data.get('message', '')
+            
+            if not settings.GEMINI_API_KEY:
+                return JsonResponse({'reply': 'La clave de Gemini no está configurada en .env.', 'status': 'error'})
+
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel('gemini-pro')
+            
+            context = (
+                f"Eres el Asistente Virtual Inteligente del sistema de Gestión Escolar del colegio 'María Auxiliadora'. "
+                f"Estás hablando con {request.user.get_full_name() or request.user.username}, que tiene el rol de '{request.user.role}'. "
+                f"Responde de forma concisa, educada y profesional. Ayuda con preguntas del sistema o de la escuela."
+            )
+            
+            prompt = f"{context}\n\nUsuario: {user_message}\nAsistente:"
+            response = model.generate_content(prompt)
+            
+            return JsonResponse({'reply': response.text})
+        except Exception as e:
+            return JsonResponse({'reply': f'Lo siento, tuve un problema interno: {str(e)}'}, status=500)
+    return JsonResponse({'error': 'Método no permitido'}, status=405)

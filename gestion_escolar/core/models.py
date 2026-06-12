@@ -112,6 +112,8 @@ class ActividadInstitucional(models.Model):
     presupuesto = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Presupuesto (S/)'
     )
+    imagen = models.ImageField(upload_to='actividades/', null=True, blank=True, verbose_name='Imagen principal')
+
 
     class Meta:
         verbose_name = 'Actividad Institucional'
@@ -215,6 +217,7 @@ class Excursion(models.Model):
         default='programada',
         verbose_name='Estado'
     )
+    imagen = models.ImageField(upload_to='excursiones/', null=True, blank=True, verbose_name='Imagen principal')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     class Meta:

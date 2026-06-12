@@ -470,6 +470,302 @@
   {% block extra_js %}{% endblock %}
 
 
+  <style>
+    /* Chatbot Styles */
+    #chatbot-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+      font-family: inherit;
+    }
+
+    #chat-toggle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 15px rgba(26, 35, 126, 0.4);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    #chat-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    #chat-toggle .bi {
+      font-size: 1.5rem;
+    }
+
+    #chat-window {
+      display: none;
+      position: absolute;
+      bottom: 75px;
+      right: 0;
+      width: 350px;
+      height: 480px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    #chat-header {
+      background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+      color: white;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #chat-header h6 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    #chat-close {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    #chat-messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      background-color: #f8f9fa;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .msg-bubble {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 15px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      position: relative;
+    }
+
+    .msg-user {
+      background: #e3f2fd;
+      color: #0d47a1;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-bot {
+      background: white;
+      color: #333;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid #eee;
+    }
+
+    .typing-demo {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .typing-demo span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ccc;
+      animation: typing 1.4s infinite ease-in-out both;
+    }
+
+    .typing-demo span:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+
+    .typing-demo span:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+
+    @keyframes typing {
+
+      0%,
+      80%,
+      100% {
+        transform: scale(0);
+      }
+
+      40% {
+        transform: scale(1);
+      }
+    }
+
+    #chat-input-area {
+      padding: 12px;
+      background: white;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 8px;
+    }
+
+    #chat-input {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      padding: 8px 15px;
+      outline: none;
+      font-size: 0.9rem;
+      transition: border-color 0.2s;
+    }
+
+    #chat-input:focus {
+      border-color: #3949ab;
+    }
+
+    #chat-send {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e3f2fd;
+      color: #1a237e;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    #chat-send:hover {
+      background: #1a237e;
+      color: white;
+    }
+  </style>
+
+  <div id="chatbot-widget">
+    <div id="chat-window">
+      <div id="chat-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-robot fs-5"></i>
+          <h6>Asistente Escolar</h6>
+        </div>
+        <button id="chat-close"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div id="chat-messages">
+        <div class="msg-bubble msg-bot">¡Hola! Soy tu asistente inteligente. ¿En qué te puedo ayudar hoy?</div>
+      </div>
+      <form id="chat-form" onsubmit="event.preventDefault(); sendChatMessage();">
+        <div id="chat-input-area">
+          <input type="text" id="chat-input" placeholder="Escribe un mensaje..." autocomplete="off">
+          <button type="submit" id="chat-send"><i class="bi bi-send-fill"></i></button>
+        </div>
+      </form>
+    </div>
+    <button id="chat-toggle" onclick="toggleChat()">
+      <i class="bi bi-chat-dots-fill"></i>
+    </button>
+  </div>
+
+  <script>
+    const chatWindow = document.getElementById('chat-window');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const chatToggleIcon = document.querySelector('#chat-toggle i');
+
+    function toggleChat() {
+      if (chatWindow.style.display === 'flex') {
+        chatWindow.style.display = 'none';
+        chatToggleIcon.className = 'bi bi-chat-dots-fill';
+      } else {
+        chatWindow.style.display = 'flex';
+        chatToggleIcon.className = 'bi bi-x-lg';
+        setTimeout(() => chatInput.focus(), 100);
+      }
+    }
+    document.getElementById('chat-close').addEventListener('click', toggleChat);
+
+    async function sendChatMessage() {
+      const msgText = chatInput.value.trim();
+      if (!msgText) return;
+
+      appendMessage(msgText, 'user');
+      chatInput.value = '';
+
+      const typingId = 'typing-' + Date.now();
+      appendTypingIndicator(typingId);
+
+      try {
+        const response = await fetch('/chatbot/api/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: JSON.stringify({ message: msgText })
+        });
+        const data = await response.json();
+        removeTypingIndicator(typingId);
+        if (data.reply) {
+          appendMessage(data.reply, 'bot');
+        } else {
+          appendMessage('Lo siento, hubo un problema al responder.', 'bot');
+        }
+      } catch (err) {
+        removeTypingIndicator(typingId);
+        appendMessage('Error de conexión o clave inválida.', 'bot');
+      }
+    }
+
+    function appendMessage(text, sender) {
+      const el = document.createElement('div');
+      el.className = `msg-bubble msg-${sender}`;
+      // Basic markdown conversion for bold text if any
+      let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      formattedText = formattedText.replace(/\n/g, '<br>');
+      el.innerHTML = formattedText;
+      chatMessages.appendChild(el);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function appendTypingIndicator(id) {
+      const el = document.createElement('div');
+      el.id = id;
+      el.className = 'msg-bubble msg-bot';
+      el.innerHTML = '<div class="typing-demo"><span></span><span></span><span></span></div>';
+      chatMessages.appendChild(el);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function removeTypingIndicator(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }
+
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+  </script>
 
 </body>
 
