@@ -3,8 +3,6 @@ Formularios del sistema de Gestión de Actividades Escolares.
 """
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Row, Column, Field, Div, HTML
 from .models import (
     User, ActividadInstitucional, PropuestaActividad,
     Excursion, Evidencia, Aviso, Mensaje, Seccion, Destino
@@ -107,18 +105,18 @@ class ExcursionForm(forms.ModelForm):
 
     class Meta:
         model = Excursion
-        fields = ['seccion', 'destino', 'fecha', 'descripcion', 'num_estudiantes', 'estado', 'imagen']
+        fields = ['destino_nombre', 'grado_seccion', 'fecha', 'descripcion', 'num_estudiantes', 'estado', 'imagen']
         widgets = {
-            'seccion': forms.Select(attrs={'class': 'form-select'}),
-            'destino': forms.Select(attrs={'class': 'form-select'}),
+            'destino_nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Parque Huajsapata, Museo, Lago Titicaca'}),
+            'grado_seccion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 3er Grado "A", 5to Primaria "B", 4to "C"'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'num_estudiantes': forms.NumberInput(attrs={'class': 'form-control'}),
             'estado': forms.Select(attrs={'class': 'form-select'}),
             'imagen': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
         }
         labels = {
-            'seccion': 'Sección',
-            'destino': 'Destino',
+            'destino_nombre': 'Destino',
+            'grado_seccion': 'Grado y Sección',
             'descripcion': 'Descripción',
             'num_estudiantes': 'N° de estudiantes',
             'estado': 'Estado',
@@ -188,13 +186,14 @@ class PerfilForm(forms.ModelForm):
     """Formulario para editar perfil de usuario."""
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'telefono', 'fecha_nacimiento', 'foto_perfil']
+        fields = ['first_name', 'last_name', 'email', 'telefono', 'fecha_nacimiento', 'seccion_asignada', 'foto_perfil']
         widgets = {
             'first_name': forms.TextInput(attrs={'class': 'form-control'}),
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'telefono': forms.TextInput(attrs={'class': 'form-control'}),
             'fecha_nacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'seccion_asignada': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 3B, 5A, ED.FISICA'}),
             'foto_perfil': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
         }
         labels = {
@@ -203,6 +202,7 @@ class PerfilForm(forms.ModelForm):
             'email': 'Correo electrónico',
             'telefono': 'Teléfono',
             'fecha_nacimiento': 'Fecha de nacimiento',
+            'seccion_asignada': 'Sección / Grado asignado',
             'foto_perfil': 'Foto de perfil',
         }
 

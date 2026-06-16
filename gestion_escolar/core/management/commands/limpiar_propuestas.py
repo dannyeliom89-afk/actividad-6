@@ -1,13 +1,17 @@
 """
-Comando de gestión para limpiar propuestas antiguas.
-Elimina automáticamente propuestas rechazadas o pendientes
-que tengan más de 24 horas de antigüedad.
+Comando de gestión para limpiar propuestas rechazadas antiguas.
+Elimina automáticamente propuestas RECHAZADAS que tengan más de 7 días (1 semana).
+Las propuestas PENDIENTES y APROBADAS NUNCA se eliminan automáticamente.
 
 Uso manual:
     python manage.py limpiar_propuestas
 
-Uso automático (Windows Task Scheduler) o cron:
-    python manage.py limpiar_propuestas --horas 24
+Opciones:
+    --dias N        Número de días para considerar expirada (por defecto: 7)
+    --dry-run       Solo muestra cuántas se eliminarían sin borrarlas
+
+Programar en Windows Task Scheduler:
+    python manage.py limpiar_propuestas --dias 7
 """
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -16,14 +20,14 @@ from core.models import PropuestaActividad
 
 
 class Command(BaseCommand):
-    help = 'Elimina propuestas rechazadas o pendientes con más de 24 horas de antigüedad'
+    help = 'Elimina propuestas RECHAZADAS con más de 7 días de antigüedad'
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--horas',
+            '--dias',
             type=int,
-            default=24,
-            help='Número de horas tras las cuales se eliminan las propuestas (default: 24)'
+            default=7,
+            help='Número de días tras los cuales se eliminan las propuestas rechazadas (default: 7)'
         )
         parser.add_argument(
             '--dry-run',
@@ -32,13 +36,13 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        horas = options['horas']
+        dias = options['dias']
         dry_run = options['dry_run']
-        limite = timezone.now() - timedelta(hours=horas)
+        limite = timezone.now() - timedelta(days=dias)
 
-        # Solo eliminar rechazadas y pendientes (NUNCA aprobadas)
+        # SOLO eliminar RECHAZADAS (NUNCA pendientes ni aprobadas)
         propuestas_a_eliminar = PropuestaActividad.objects.filter(
-            estado__in=['rechazada', 'pendiente'],
+            estado='rechazada',
             fecha_propuesta__lte=limite
         )
 
@@ -46,17 +50,17 @@ class Command(BaseCommand):
 
         if total == 0:
             self.stdout.write(self.style.SUCCESS(
-                f'✓ No hay propuestas para limpiar (antigüedad > {horas}h).'
+                f'✓ No hay propuestas rechazadas para limpiar (antigüedad > {dias} días).'
             ))
             return
 
         if dry_run:
             self.stdout.write(self.style.WARNING(
-                f'[DRY-RUN] Se eliminarían {total} propuestas con más de {horas}h:'
+                f'[DRY-RUN] Se eliminarían {total} propuestas rechazadas con más de {dias} días:'
             ))
             for p in propuestas_a_eliminar:
                 self.stdout.write(
-                    f'  - [{p.estado.upper()}] "{p.titulo}" '
+                    f'  - [RECHAZADA] "{p.titulo}" '
                     f'(por: {p.propuesta_por.username}, '
                     f'fecha: {p.fecha_propuesta.strftime("%d/%m/%Y %H:%M")})'
                 )
@@ -64,7 +68,7 @@ class Command(BaseCommand):
             titulos = list(propuestas_a_eliminar.values_list('titulo', flat=True))
             propuestas_a_eliminar.delete()
             self.stdout.write(self.style.SUCCESS(
-                f'✓ {total} propuesta(s) eliminadas (antigüedad > {horas}h):'
+                f'✓ {total} propuesta(s) rechazadas eliminadas (antigüedad > {dias} días):'
             ))
             for titulo in titulos:
                 self.stdout.write(f'  - "{titulo}"')

@@ -1,29 +1,105 @@
 {% extends 'base.html' %}
-{% block title %}Excursiones{% endblock %}
-{% block page_title %}Excursiones{% endblock %}
+{% block title %}{% if user.is_director %}Todas las Excursiones{% else %}Mis Excursiones{% endif %}{% endblock %}
+{% block page_title %}{% if user.is_director %}Excursiones de Docentes{% else %}Mis Excursiones{% endif %}{% endblock %}
 {% block topbar_actions %}
-  <a href="{% url 'excursion_crear' %}" class="btn btn-sm btn-primary">
-    <i class="bi bi-plus-lg me-1"></i>Nueva Excursión
-  </a>
+{% if not user.is_director %}
+<a href="{% url 'excursion_crear' %}" class="btn btn-sm btn-primary">
+  <i class="bi bi-plus-lg me-1"></i>Nueva Excursión
+</a>
+{% endif %}
 {% endblock %}
 {% block content %}
+
+{% if user.is_director %}
+{# ─── Vista del Director ─── #}
+<div class="row g-4">
+  {% for exc in excursiones %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
+        {% if exc.estado == 'realizada' %}
+        <span class="badge bg-success rounded-pill px-2">Realizada</span>
+        {% elif exc.estado == 'cancelada' %}
+        <span class="badge bg-danger rounded-pill px-2">Cancelada</span>
+        {% else %}
+        <span class="badge bg-primary rounded-pill px-2">Programada</span>
+        {% endif %}
+        <small class="text-muted fw-bold">{{ exc.fecha|date:"d/m/Y" }}</small>
+      </div>
+      <div class="card-body">
+        <h6 class="fw-bold mb-3 d-flex align-items-center">
+          <i class="bi bi-geo-alt-fill text-danger me-2"></i>
+          {{ exc.get_destino_display_name }}
+        </h6>
+
+        <div class="small text-muted mb-3">
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-mortarboard me-2 text-info"></i>
+            {{ exc.grado_seccion|default:exc.grado|default:"—" }}
+          </div>
+          <div class="d-flex align-items-center mb-1">
+            <i class="bi bi-person-fill me-2 text-primary"></i>
+            <strong>{{ exc.responsable.get_full_name|default:exc.responsable.username }}</strong>
+          </div>
+          <div class="d-flex align-items-center">
+            <i class="bi bi-people me-2 text-secondary"></i>
+            {{ exc.num_estudiantes }} estudiantes
+          </div>
+        </div>
+
+        {% if exc.descripcion %}
+        <p class="card-text text-muted small mb-0 border-top pt-2">
+          <i class="bi bi-chat-left-dots-fill me-1 opacity-50"></i>
+          {{ exc.descripcion|truncatechars:85 }}
+        </p>
+        {% endif %}
+      </div>
+      <div class="card-footer bg-white border-top-0 pt-0">
+        <a href="{% url 'excursion_detalle' exc.pk %}" class="btn btn-sm btn-outline-primary w-100">
+          <i class="bi bi-eye me-1"></i>Ver detalle de la excursión
+        </a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12 text-center py-5 text-muted">
+    <div class="opacity-50 mb-3">
+      <i class="bi bi-map" style="font-size: 4rem;"></i>
+    </div>
+    <h5>No hay excursiones registradas</h5>
+    <p>Aún no se han registrado excursiones por parte de los docentes.</p>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+{# ─── Vista del Docente: solo ve SUS PROPIAS excursiones (historial) ─── #}
+<div class="d-flex align-items-center gap-2 mb-3">
+  <i class="bi bi-clock-history text-secondary fs-5"></i>
+  <span class="text-muted">Tu historial de excursiones — solo tú puedes ver las tuyas.</span>
+</div>
+
+{% if excursiones %}
+{# Separar próximas y pasadas/realizadas #}
+{% regroup excursiones by estado as excursiones_por_estado %}
+
 <div class="row g-3">
   {% for exc in excursiones %}
   <div class="col-md-6 col-lg-4">
-    <div class="card h-100">
+    <div
+      class="card h-100 {% if exc.estado == 'realizada' %}border-success border-opacity-50{% elif exc.estado == 'cancelada' %}border-danger border-opacity-50{% else %}border-primary border-opacity-50{% endif %}">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <span class="badge {% if exc.estado == 'realizada' %}bg-success{% elif exc.estado == 'cancelada' %}bg-danger{% else %}bg-primary{% endif %} rounded-pill">
+        <span
+          class="badge {% if exc.estado == 'realizada' %}bg-success{% elif exc.estado == 'cancelada' %}bg-danger{% else %}bg-primary{% endif %} rounded-pill">
           {{ exc.get_estado_display }}
         </span>
         <small class="text-muted">{{ exc.fecha|date:"d/m/Y" }}</small>
       </div>
       <div class="card-body">
         <h6 class="card-title d-flex align-items-center gap-2">
-          <i class="bi bi-geo-alt-fill text-danger"></i>{{ exc.destino.nombre }}
+          <i class="bi bi-geo-alt-fill text-danger"></i>{{ exc.get_destino_display_name }}
         </h6>
         <p class="text-muted small mb-2">
-          <i class="bi bi-collection me-1"></i>{{ exc.seccion.nombre }}<br>
-          <i class="bi bi-person me-1"></i>{{ exc.responsable.get_full_name|default:exc.responsable.username }}<br>
+          {% if exc.grado_seccion %}<i class="bi bi-mortarboard me-1"></i>{{ exc.grado_seccion }}<br>{% endif %}
           <i class="bi bi-people me-1"></i>{{ exc.num_estudiantes }} estudiantes
         </p>
         {% if exc.descripcion %}
@@ -43,11 +119,18 @@
       </div>
     </div>
   </div>
-  {% empty %}
-  <div class="col-12 text-center py-5 text-muted">
-    <i class="bi bi-map fs-1 d-block mb-2"></i>
-    No hay excursiones registradas.
-  </div>
   {% endfor %}
 </div>
+
+{% else %}
+<div class="text-center py-5 text-muted">
+  <i class="bi bi-map fs-1 d-block mb-2"></i>
+  <p class="mb-3">Aún no has registrado ninguna excursión.</p>
+  <a href="{% url 'excursion_crear' %}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>Registrar mi primera excursión
+  </a>
+</div>
+{% endif %}
+
+{% endif %}
 {% endblock %}

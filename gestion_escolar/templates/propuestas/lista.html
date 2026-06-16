@@ -2,33 +2,45 @@
 {% block title %}Propuestas{% endblock %}
 {% block page_title %}Propuestas de Actividad{% endblock %}
 {% block topbar_actions %}
-  {% if user.is_docente %}
-  <a href="{% url 'propuesta_crear' %}" class="btn btn-sm btn-primary">
-    <i class="bi bi-plus-lg me-1"></i>Nueva Propuesta
-  </a>
-  {% endif %}
+{% if user.is_docente %}
+<a href="{% url 'propuesta_crear' %}" class="btn btn-sm btn-primary">
+  <i class="bi bi-plus-lg me-1"></i>Nueva Propuesta
+</a>
+{% endif %}
 {% endblock %}
 
 {% block content %}
+
+{# ══════════════════ VISTA DIRECTOR ══════════════════ #}
 {% if user.is_director %}
-<div class="mb-3 d-flex gap-2 flex-wrap">
-  <a href="{% url 'propuestas_lista' %}" class="btn btn-sm {% if not estado %}btn-primary{% else %}btn-outline-primary{% endif %}">Todas</a>
-  <a href="?estado=pendiente" class="btn btn-sm {% if estado == 'pendiente' %}btn-warning{% else %}btn-outline-warning{% endif %}">Pendientes</a>
-  <a href="?estado=aprobada" class="btn btn-sm {% if estado == 'aprobada' %}btn-success{% else %}btn-outline-success{% endif %}">Aprobadas</a>
-  <a href="?estado=rechazada" class="btn btn-sm {% if estado == 'rechazada' %}btn-danger{% else %}btn-outline-danger{% endif %}">Rechazadas</a>
+
+<div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
+  <span class="text-muted small me-1"><i class="bi bi-funnel me-1"></i>Filtrar:</span>
+  <a href="{% url 'propuestas_lista' %}"
+    class="btn btn-sm {% if not estado %}btn-primary{% else %}btn-outline-primary{% endif %}">Todas</a>
+  <a href="?estado=pendiente"
+    class="btn btn-sm {% if estado == 'pendiente' %}btn-warning{% else %}btn-outline-warning{% endif %}">Pendientes</a>
+  <a href="?estado=aprobada"
+    class="btn btn-sm {% if estado == 'aprobada' %}btn-success{% else %}btn-outline-success{% endif %}">Aprobadas</a>
+  <a href="?estado=rechazada"
+    class="btn btn-sm {% if estado == 'rechazada' %}btn-danger{% else %}btn-outline-danger{% endif %}">Rechazadas</a>
 </div>
-{% endif %}
 
 <div class="row g-3">
   {% for p in propuestas %}
   <div class="col-md-6 col-lg-4">
-    <div class="card h-100">
+    <div class="card h-100 shadow-sm border-0">
       <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <span class="badge badge-{{ p.estado }} rounded-pill px-2 py-1">{{ p.get_estado_display }}</span>
+        <span class="badge rounded-pill px-2 py-1
+          {% if p.estado == 'aprobada' %}bg-success
+          {% elif p.estado == 'rechazada' %}bg-danger
+          {% else %}bg-warning text-dark{% endif %}">
+          {{ p.get_estado_display }}
+        </span>
         <small class="text-muted">{{ p.fecha_propuesta|date:"d/m/Y" }}</small>
       </div>
       <div class="card-body">
-        <h6 class="card-title">{{ p.titulo }}</h6>
+        <h6 class="card-title fw-semibold">{{ p.titulo }}</h6>
         <p class="card-text text-muted small">{{ p.descripcion|truncatechars:100 }}</p>
         <small class="text-muted d-block">
           <i class="bi bi-person me-1"></i>{{ p.propuesta_por.get_full_name|default:p.propuesta_por.username }}
@@ -43,29 +55,154 @@
           <i class="bi bi-chat-left-text me-1"></i><strong>Director:</strong> {{ p.observacion_admin|truncatechars:80 }}
         </div>
         {% endif %}
+        {% if p.estado == 'aprobada' %}
+        <div class="mt-2">
+          <small class="text-success fw-semibold"><i class="bi bi-check-circle-fill me-1"></i>Convertida en actividad
+            institucional</small>
+        </div>
+        {% endif %}
       </div>
       <div class="card-footer bg-white d-flex gap-2 flex-wrap">
         <a href="{% url 'propuesta_detalle' p.pk %}" class="btn btn-sm btn-outline-primary">
           <i class="bi bi-eye me-1"></i>Ver
         </a>
-        {% if user.is_director and p.estado == 'pendiente' %}
+        {% if p.estado == 'pendiente' %}
         <a href="{% url 'propuesta_revisar' p.pk %}" class="btn btn-sm btn-warning">
           <i class="bi bi-check2-square me-1"></i>Revisar
         </a>
         {% endif %}
-        {% if user.is_director and p.estado != 'aprobada' %}
         <a href="{% url 'propuesta_eliminar' p.pk %}" class="btn btn-sm btn-outline-danger">
           <i class="bi bi-trash3 me-1"></i>Eliminar
         </a>
-        {% endif %}
       </div>
     </div>
   </div>
   {% empty %}
   <div class="col-12 text-center py-5 text-muted">
     <i class="bi bi-lightbulb fs-1 d-block mb-2"></i>
-    No hay propuestas {% if user.is_docente %}enviadas{% else %}registradas{% endif %} aún.
+    No hay propuestas{% if estado %} con estado "{{ estado }}"{% endif %}.
   </div>
   {% endfor %}
 </div>
+
+{% else %}
+{# ══════════════════ VISTA DOCENTE ══════════════════ #}
+
+{# --- Sección: Propuestas Aprobadas (mural público) --- #}
+<div class="mb-4">
+  <div class="d-flex align-items-center mb-3">
+    <span class="badge bg-success me-2 px-3 py-2 fs-6"><i class="bi bi-check-circle-fill me-1"></i>Aprobadas – Ahora son
+      Actividades</span>
+    <small class="text-muted">Propuestas aprobadas por el director, visibles para todos los docentes</small>
+  </div>
+
+  <div class="row g-3">
+    {% for p in propuestas_aprobadas %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm border-success border-opacity-50">
+        <div class="card-header" style="background: linear-gradient(135deg,#d1fae5,#a7f3d0);">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>Aprobada</span>
+            <small class="text-muted">{{ p.fecha_revision|date:"d/m/Y"|default:p.fecha_propuesta|date:"d/m/Y" }}</small>
+          </div>
+        </div>
+        <div class="card-body">
+          <h6 class="card-title fw-bold">{{ p.titulo }}</h6>
+          <p class="card-text text-muted small">{{ p.descripcion|truncatechars:120 }}</p>
+          <small class="text-muted d-block">
+            <i class="bi bi-person-circle me-1 text-success"></i>
+            Propuesto por: <strong>{{ p.propuesta_por.get_full_name|default:p.propuesta_por.username }}</strong>
+          </small>
+          {% if p.fecha_actividad_propuesta %}
+          <small class="text-muted d-block mt-1">
+            <i class="bi bi-calendar-event me-1"></i>Fecha: {{ p.fecha_actividad_propuesta|date:"d/m/Y" }}
+          </small>
+          {% endif %}
+          {% if p.observacion_admin %}
+          <div class="alert alert-success mt-2 py-2 px-2 mb-0" style="font-size:.8rem;">
+            <i class="bi bi-chat-left-text me-1"></i><strong>Director:</strong> {{ p.observacion_admin|truncatechars:100 }}
+          </div>
+          {% endif %}
+        </div>
+        <div class="card-footer" style="background:#f0fdf4;">
+          <a href="{% url 'propuesta_detalle' p.pk %}" class="btn btn-sm btn-outline-success">
+            <i class="bi bi-eye me-1"></i>Ver detalle
+          </a>
+          <small class="text-success ms-2"><i class="bi bi-calendar-check me-1"></i>Ya es una actividad
+            institucional</small>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="alert alert-light text-center text-muted py-4">
+        <i class="bi bi-hourglass fs-3 d-block mb-1"></i>
+        Aún no hay propuestas aprobadas.
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<hr class="my-4">
+
+{# --- Sección: Mis Propuestas Pendientes y Rechazadas --- #}
+<div class="d-flex align-items-center mb-3">
+  <span class="badge bg-secondary me-2 px-3 py-2 fs-6"><i class="bi bi-send me-1"></i>Mis Propuestas</span>
+  <small class="text-muted">Tus propuestas pendientes de revisión o rechazadas</small>
+</div>
+
+<div class="row g-3">
+  {% for p in mis_propuestas %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 shadow-sm border-0
+      {% if p.estado == 'rechazada' %}border-danger border-opacity-50{% endif %}">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span class="badge rounded-pill px-2 py-1
+          {% if p.estado == 'rechazada' %}bg-danger
+          {% else %}bg-warning text-dark{% endif %}">
+          {{ p.get_estado_display }}
+        </span>
+        <small class="text-muted">{{ p.fecha_propuesta|date:"d/m/Y" }}</small>
+      </div>
+      <div class="card-body">
+        <h6 class="card-title fw-semibold">{{ p.titulo }}</h6>
+        <p class="card-text text-muted small">{{ p.descripcion|truncatechars:100 }}</p>
+        {% if p.fecha_actividad_propuesta %}
+        <small class="text-muted d-block">
+          <i class="bi bi-calendar me-1"></i>Propuesta para: {{ p.fecha_actividad_propuesta|date:"d/m/Y" }}
+        </small>
+        {% endif %}
+        {% if p.observacion_admin %}
+        <div
+          class="alert {% if p.estado == 'rechazada' %}alert-danger{% else %}alert-light{% endif %} mt-2 py-2 px-2 mb-0"
+          style="font-size:.8rem;">
+          <i class="bi bi-chat-left-text me-1"></i><strong>Director:</strong> {{ p.observacion_admin|truncatechars:100 }}
+        </div>
+        {% endif %}
+        {% if p.estado == 'rechazada' %}
+        <div class="mt-2">
+          <small class="text-danger"><i class="bi bi-clock-history me-1"></i>Se eliminará automáticamente en 7
+            días</small>
+        </div>
+        {% endif %}
+      </div>
+      <div class="card-footer bg-white d-flex gap-2 flex-wrap">
+        <a href="{% url 'propuesta_detalle' p.pk %}" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-eye me-1"></i>Ver
+        </a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="alert alert-light text-center text-muted py-4">
+      <i class="bi bi-lightbulb fs-3 d-block mb-1"></i>
+      No tienes propuestas enviadas aún. ¡Propone una actividad al director!
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endif %}
 {% endblock %}

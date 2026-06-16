@@ -1,0 +1,79 @@
+ Director
+Usuario	Contraseña	Nombre
+
+director
+Director2025!	Director IE 1122 Maria Auxiliadora
+🏫 1° Grado
+Sección	Usuario	Contraseña	Nombre
+1A	hulmer_1a	Loayza123	Hulmer Ramiro Loayza Juanito
+1B	emilio_1b	Mamani123	Emilio Mamani Parisuana
+1C	dina_1c	Quisocala123	Dina Quisocala Lope
+1D	irma_1d	Sanchez123	Irma Sanchez Quispe
+1E	fredy_1e	Vargas123	Fredy Vargas Pampa
+1F	nury_1f	Lanza123	Nury Sabina Lanza Gallegos
+1G	carmen_1g	Lopez123	Carmen Rosa Lopez Tavera
+1H	justo_1h	Quispe123	Justo Javier Quispe Quispe
+🏫 2° Grado
+Sección	Usuario	Contraseña	Nombre
+2A	karla_2a	Ramos123	Karla Yanira Ramos Condori
+2B	jafet_2b	Ramirez123	Jafet Jose Ramirez Paredes
+2C	severiano_2c	Quispe123	Severiano Quispe Fernandez
+2D	roger_2d	Calizaya123	Roger Calizaya Maldonado
+2E	ygor_2e	Pacori123	Ygor Pacori Quecara
+2F	semproniana_2f	Salazar123	Semproniana Salazar Canaza
+2G	lidia_2g	Bustinza123	Lidia Marina Bustinza Ticona
+2H	sonia_2h	Gerpa123	Sonia Mercedes Gerpa Jove
+🏫 3° Grado
+Sección	Usuario	Contraseña	Nombre
+3A	nery_3a	Gutierrez123	Nery Susana Gutierrez Mendoza
+3B	delia_3b	Apaza123	Delia Rosa Apaza Munoz
+3C	ruth_3c	Puma123	Ruth Yaneth Puma Vilca
+3D	ines_3d	Mamani123	Ines Mamani Monzon
+3E	justo_3e	Arias123	Justo Willy Arias Zaravia
+3F	norma_3f	Coapaza123	Norma Justina Coapaza Quispe
+3G	juan_3g	Ticona123	Juan Ticona Maquera
+3H	zaida_3h	Calizaya123	Zaida Veronica Calizaya Castro
+🏫 4° Grado
+Sección	Usuario	Contraseña	Nombre
+4A	ana_4a	Sucasaca123	Ana Maria Sucasaca Toledo
+4B	edgar_4b	Barrantes123	Edgar Barrantes Vilca
+4C	martha_4c	Gutierrez123	Martha Anely Gutierrez Chata
+4D	jorge_4d	Condori123	Jorge Condori Mamani
+4E	lucrecia_4e	Ayqui123	Lucrecia Ayqui Suca
+4F	marina_4f	Miranda123	Marina Dionicia Miranda Yucra
+4G	david_4g	Cahuana123	David Cahuana Ccallo
+4H	elizabeth_4h	Escobedo123	Elizabeth Rosaura Escobedo Enriquez
+🏫 5° Grado
+Sección	Usuario	Contraseña	Nombre
+5A	clorinda_5a	Velasquez123	Clorinda Velasquez Chambi
+5B	constantino_5b	Coila123	Constantino Coila Velasquez
+5C	amalia_5c	Paredes123	Amalia Paredes Calvo
+5D	nelly_5d	Mamani123	Nelly Maritza Mamani Mamani
+5E	fabiana_5e	Mamani123	Fabiana Mamani Chambi
+5F	gina_5f	Masco123	Gina Gloria Masco Mayta
+5G	luz_5g	Canaza123	Luz Mirian Canaza Mamani
+5H	walker_5h	Ramos123	Walker Anibal Ramos Caceres
+🏫 6° Grado
+Sección	Usuario	Contraseña	Nombre
+6A	genoveva_6a	Acero123	Genoveva Acero Ticona
+6B	mauro_6b	Amanqui123	Mauro Ermitano Amanqui Mamani
+6C	gerardo_6c	Mamani123	Gerardo Victorino Mamani Reyes
+6D	lourdes_6d	Rossel123	Lourdes Rossel Cespedes
+6E	cleto_6e	Zamata123	Cleto Marcelino Zamata Ticona
+6F	ruth_6f	Aquice123	Ruth Elizabeth Aquice Quispe
+6G	maria_6g	Mollinedo123	Maria Magdalena Mollinedo Claverias
+6H	julio_6h	Pino123	Julio Ronalth Pino Yanqui
+⚽ Ed. Física
+Usuario	Contraseña	Nombre
+eddy_edfisica	Ticona123	Eddy Leoradia Ticona Mendez
+paul_edfisica	Pari123	Paul Aquiles Pari Humpiri
+juan_edfisica	Gutierrez123	Juan Bonifacio Gutierrez Viza
+francisco_edfisica	Arapa123	Francisco Alfredo Arapa Mamani
+edith_edfisica	Quispe123	Edith Quispe Tapia
+🎯 Otros
+Cargo	Usuario	Contraseña	Nombre
+PIP	adrian_pip	Vilcapaza123	Adrian Vilcapaza Ccuno
+PIP	hector_pip	Paricahua123	Hector Fredy Paricahua Condori
+Psicología	rosanel_psicologia	Zavala123	Rosanel Yurby Zavala Ttito
+Secretaría	nieves_secretaria	Huaynacho123	Nieves Pilar Huaynacho Quispe
+Auxiliar	lidia_auxiliar	Miranda123

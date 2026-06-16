@@ -18,6 +18,7 @@ class User(AbstractUser):
     telefono = models.CharField(max_length=15, blank=True, verbose_name='Teléfono')
     fecha_nacimiento = models.DateField(null=True, blank=True, verbose_name='Fecha de nacimiento')
     foto_perfil = models.ImageField(upload_to='perfiles/', blank=True, null=True, verbose_name='Foto de perfil')
+    seccion_asignada = models.CharField(max_length=50, blank=True, verbose_name='Sección / Grado asignado', help_text='Ej: 3B, 5A, ED.FISICA')
 
     class Meta:
         verbose_name = 'Usuario'
@@ -190,18 +191,28 @@ class PropuestaActividad(models.Model):
 
 class Excursion(models.Model):
     """Excursión organizada por un docente para una sección."""
+    # Campos de texto libre (el docente escribe directamente)
+    seccion_nombre = models.CharField(max_length=100, blank=True, verbose_name='Sección', help_text='Ej: 3°A, 5°B')
+    grado = models.CharField(max_length=100, blank=True, verbose_name='Grado', help_text='Ej: 3er Grado, 5to Primaria')
+    grado_seccion = models.CharField(max_length=200, blank=True, verbose_name='Grado y Sección', help_text='Ej: 3er Grado "A", 5to Primaria "B"')
+    destino_nombre = models.CharField(max_length=200, blank=True, verbose_name='Destino', help_text='Ej: Parque, Museo, Lago Titicaca')
+
+    # FKs opcionales (compatibilidad con datos anteriores)
     seccion = models.ForeignKey(
         Seccion,
-        on_delete=models.CASCADE,
-        verbose_name='Sección',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        verbose_name='Sección (referencia)',
         related_name='excursiones'
     )
     destino = models.ForeignKey(
         Destino,
-        on_delete=models.CASCADE,
-        verbose_name='Destino',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        verbose_name='Destino (referencia)',
         related_name='excursiones'
     )
+
     fecha = models.DateField(verbose_name='Fecha de excursión')
     responsable = models.ForeignKey(
         User,
@@ -209,6 +220,7 @@ class Excursion(models.Model):
         related_name='excursiones_responsable',
         verbose_name='Docente responsable'
     )
+    aula = models.CharField(max_length=50, blank=True, verbose_name='Aula', help_text='Ej: 3°A, Aula 5, Primaria 2')
     descripcion = models.TextField(blank=True, verbose_name='Descripción')
     num_estudiantes = models.IntegerField(default=0, verbose_name='N° de estudiantes')
     estado = models.CharField(
@@ -225,8 +237,16 @@ class Excursion(models.Model):
         verbose_name_plural = 'Excursiones'
         ordering = ['-fecha']
 
+    def get_seccion_display_name(self):
+        return self.seccion_nombre or (self.seccion.nombre if self.seccion else '—')
+
+    def get_destino_display_name(self):
+        return self.destino_nombre or (self.destino.nombre if self.destino else '—')
+
     def __str__(self):
-        return f"Excursión a {self.destino.nombre} - {self.seccion.nombre} ({self.fecha})"
+        destino = self.get_destino_display_name()
+        seccion = self.get_seccion_display_name()
+        return f"Excursión a {destino} - {seccion} ({self.fecha})"
 
 
 class Evidencia(models.Model):

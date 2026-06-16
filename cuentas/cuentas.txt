@@ -1,11 +1,79 @@
-ID	Usuario	Contraseña por defecto
-2	docente1	docente1234
-3	docente2	docente1234
-4	docente3	docente1234
-5	docente4	docente1234
+Director
+Usuario	Contraseña
 
-
-
-Usuario: director
-Contraseña: admin1234
-ID: 1
+director
+director2025
+🏫 1° Grado
+Sección	Usuario	Contraseña
+1A	hulmer_1a	Loayza123
+1B	emilio_1b	Mamani123
+1C	dina_1c	Quisocala123
+1D	irma_1d	Sanchez123
+1E	fredy_1e	Vargas123
+1F	nury_1f	Lanza123
+1G	carmen_1g	Lopez123
+1H	justo_1h	Quispe123
+🏫 2° Grado
+Sección	Usuario	Contraseña
+2A	karla_2a	Ramos123
+2B	jafet_2b	Ramirez123
+2C	severiano_2c	Quispe123
+2D	roger_2d	Calizaya123
+2E	ygor_2e	Pacori123
+2F	semproniana_2f	Salazar123
+2G	lidia_2g	Bustinza123
+2H	sonia_2h	Gerpa123
+🏫 3° Grado
+Sección	Usuario	Contraseña
+3A	nery_3a	Gutierrez123
+3B	delia_3b	Apaza123
+3C	ruth_3c	Puma123
+3D	ines_3d	Mamani123
+3E	justo_3e	Arias123
+3F	norma_3f	Coapaza123
+3G	juan_3g	Ticona123
+3H	zaida_3h	Calizaya123
+🏫 4° Grado
+Sección	Usuario	Contraseña
+4A	ana_4a	Sucasaca123
+4B	edgar_4b	Barrantes123
+4C	martha_4c	Gutierrez123
+4D	jorge_4d	Condori123
+4E	lucrecia_4e	Ayqui123
+4F	marina_4f	Miranda123
+4G	david_4g	Cahuana123
+4H	elizabeth_4h	Escobedo123
+🏫 5° Grado
+Sección	Usuario	Contraseña
+5A	clorinda_5a	Velasquez123
+5B	constantino_5b	Coila123
+5C	amalia_5c	Paredes123
+5D	nelly_5d	Mamani123
+5E	fabiana_5e	Mamani123
+5F	gina_5f	Masco123
+5G	luz_5g	Canaza123
+5H	walker_5h	Ramos123
+🏫 6° Grado
+Sección	Usuario	Contraseña
+6A	genoveva_6a	Acero123
+6B	mauro_6b	Amanqui123
+6C	gerardo_6c	Mamani123
+6D	lourdes_6d	Rossel123
+6E	cleto_6e	Zamata123
+6F	ruth_6f	Aquice123
+6G	maria_6g	Mollinedo123
+6H	julio_6h	Pino123
+⚽ Ed. Física
+Usuario	Contraseña
+eddy_edfisica	Ticona123
+paul_edfisica	Pari123
+juan_edfisica	Gutierrez123
+francisco_edfisica	Arapa123
+edith_edfisica	Quispe123
+🎯 Otros
+Cargo	Usuario	Contraseña
+PIP	adrian_pip	Vilcapaza123
+PIP	hector_pip	Paricahua123
+Psicología	rosanel_psicologia	Zavala123
+Secretaría	nieves_secretaria	Huaynacho123
+Auxiliar	lidia_auxiliar	Miranda123

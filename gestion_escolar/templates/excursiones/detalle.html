@@ -1,68 +1,142 @@
 {% extends 'base.html' %}
-{% block title %}{{ excursion }}{% endblock %}
+{% block title %}Detalle de Excursión{% endblock %}
 {% block page_title %}Detalle de Excursión{% endblock %}
+
 {% block topbar_actions %}
-  <a href="{% url 'excursion_editar' excursion.pk %}" class="btn btn-sm btn-outline-primary">
-    <i class="bi bi-pencil me-1"></i>Editar
-  </a>
+{% if es_responsable %}
+<a href="{% url 'excursion_editar' excursion.pk %}" class="btn btn-sm btn-outline-primary">
+  <i class="bi bi-pencil me-1"></i>Editar
+</a>
+{% endif %}
 {% endblock %}
+
 {% block content %}
 <div class="row g-4">
   <div class="col-lg-8">
-    <div class="card mb-4">
-      <div class="card-header bg-white">
-        <i class="bi bi-geo-alt-fill text-danger me-2"></i>{{ excursion.destino.nombre }}
-        <span class="badge {% if excursion.estado == 'realizada' %}bg-success{% elif excursion.estado == 'cancelada' %}bg-danger{% else %}bg-primary{% endif %} ms-2">{{ excursion.get_estado_display }}</span>
+
+    <!-- ── Información principal ── -->
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <i class="bi bi-geo-alt-fill me-2"></i>
+        <strong>Información de la Excursión</strong>
       </div>
       <div class="card-body">
-        <div class="row g-3">
-          <div class="col-sm-4">
-            <div class="text-muted small">Sección</div>
-            <div class="fw-semibold">{{ excursion.seccion.nombre }}</div>
-          </div>
-          <div class="col-sm-4">
-            <div class="text-muted small">Fecha</div>
-            <div class="fw-semibold">{{ excursion.fecha|date:"d/m/Y" }}</div>
-          </div>
-          <div class="col-sm-4">
-            <div class="text-muted small">Responsable</div>
-            <div class="fw-semibold">{{ excursion.responsable.get_full_name|default:excursion.responsable.username }}</div>
-          </div>
-          <div class="col-sm-4">
-            <div class="text-muted small">Estudiantes</div>
-            <div class="fw-semibold">{{ excursion.num_estudiantes }}</div>
-          </div>
-          <div class="col-sm-4">
-            <div class="text-muted small">Ubicación destino</div>
-            <div class="fw-semibold">{{ excursion.destino.ubicacion|default:"—" }}</div>
-          </div>
-          {% if excursion.descripcion %}
-          <div class="col-12">
-            <div class="text-muted small">Descripción</div>
-            <p class="mb-0">{{ excursion.descripcion }}</p>
-          </div>
-          {% endif %}
-        </div>
+        <table class="table table-borderless mb-0">
+          <tbody>
+            <tr>
+              <th class="text-muted ps-0" style="width:40%">
+                <i class="bi bi-flag me-1 text-primary"></i>Estado
+              </th>
+              <td>
+                {% if excursion.estado == 'realizada' %}
+                <span class="badge bg-success fs-6 px-3 py-2">
+                  <i class="bi bi-check-circle me-1"></i>Realizada
+                </span>
+                {% elif excursion.estado == 'cancelada' %}
+                <span class="badge bg-danger fs-6 px-3 py-2">
+                  <i class="bi bi-x-circle me-1"></i>Cancelada
+                </span>
+                {% else %}
+                <span class="badge bg-primary fs-6 px-3 py-2">
+                  <i class="bi bi-clock me-1"></i>Programada
+                </span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th class="text-muted ps-0">
+                <i class="bi bi-geo-alt me-1 text-danger"></i>Destino
+              </th>
+              <td class="fw-semibold">
+                {% if excursion.destino_nombre %}
+                {{ excursion.destino_nombre }}
+                {% elif excursion.destino %}
+                {{ excursion.destino.nombre }}
+                {% else %}
+                <span class="text-muted">Sin especificar</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th class="text-muted ps-0">
+                <i class="bi bi-mortarboard me-1 text-info"></i>Grado y Sección
+              </th>
+              <td class="fw-semibold">
+                {% if excursion.grado_seccion %}
+                {{ excursion.grado_seccion }}
+                {% elif excursion.grado %}
+                {{ excursion.grado }}
+                {% elif excursion.seccion_nombre %}
+                {{ excursion.seccion_nombre }}
+                {% else %}
+                <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th class="text-muted ps-0">
+                <i class="bi bi-calendar-event me-1 text-warning"></i>Fecha
+              </th>
+              <td class="fw-semibold">{{ excursion.fecha|date:"d \d\e F \d\e Y" }}</td>
+            </tr>
+            <tr>
+              <th class="text-muted ps-0">
+                <i class="bi bi-person-fill me-1 text-success"></i>Responsable
+              </th>
+              <td class="fw-semibold">
+                {{ excursion.responsable.get_full_name|default:excursion.responsable.username }}
+              </td>
+            </tr>
+            <tr>
+              <th class="text-muted ps-0">
+                <i class="bi bi-people me-1 text-primary"></i>N° de Estudiantes
+              </th>
+              <td class="fw-semibold">{{ excursion.num_estudiantes }} estudiantes</td>
+            </tr>
+            {% if excursion.destino and excursion.destino.ubicacion %}
+            <tr>
+              <th class="text-muted ps-0">
+                <i class="bi bi-pin-map me-1 text-danger"></i>Ubicación del Destino
+              </th>
+              <td class="fw-semibold">{{ excursion.destino.ubicacion }}</td>
+            </tr>
+            {% endif %}
+            {% if excursion.descripcion %}
+            <tr>
+              <th class="text-muted ps-0 align-top">
+                <i class="bi bi-text-left me-1"></i>Descripción
+              </th>
+              <td>{{ excursion.descripcion }}</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- Evidencias -->
-    <div class="card">
-      <div class="card-header bg-white d-flex justify-content-between">
-        <span><i class="bi bi-images text-primary me-2"></i>Evidencias Fotográficas</span>
-        <span class="badge bg-secondary">{{ evidencias.count }}</span>
+    <!-- ── Evidencias Fotográficas ── -->
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-images text-primary me-2"></i><strong>Evidencias Fotográficas</strong></span>
+        <span class="badge bg-secondary rounded-pill">{{ evidencias.count }}</span>
       </div>
       <div class="card-body">
-        <form method="post" enctype="multipart/form-data" action="{% url 'evidencia_subir_excursion' excursion.pk %}" class="mb-4">
+        {% if es_responsable %}
+        <form method="post" enctype="multipart/form-data" action="{% url 'evidencia_subir_excursion' excursion.pk %}"
+          class="mb-4">
           {% csrf_token %}
           <div class="row g-2 align-items-end">
             <div class="col-md-6">{{ form_evidencia.imagen }}</div>
             <div class="col-md-4">{{ form_evidencia.descripcion }}</div>
             <div class="col-md-2">
-              <button type="submit" class="btn btn-primary w-100"><i class="bi bi-upload"></i></button>
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-upload"></i>
+              </button>
             </div>
           </div>
         </form>
+        {% endif %}
+
         {% if evidencias %}
         <div class="row g-3">
           {% for ev in evidencias %}
@@ -77,7 +151,7 @@
                 <form method="post" action="{% url 'evidencia_eliminar' ev.pk %}">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-sm btn-outline-danger w-100 py-1"
-                          onclick="return confirm('¿Eliminar esta evidencia?')">
+                    onclick="return confirm('¿Eliminar esta evidencia?')">
                     <i class="bi bi-trash"></i>
                   </button>
                 </form>
@@ -94,23 +168,57 @@
         {% endif %}
       </div>
     </div>
+
   </div>
 
+  <!-- ── Panel lateral de acciones ── -->
   <div class="col-lg-4">
-    <div class="card">
-      <div class="card-header bg-white"><i class="bi bi-info-circle me-2"></i>Acciones</div>
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">
+        <i class="bi bi-info-circle me-2"></i><strong>Acciones</strong>
+      </div>
       <div class="card-body d-grid gap-2">
+        {% if es_responsable %}
         <a href="{% url 'excursion_editar' excursion.pk %}" class="btn btn-outline-primary btn-sm">
           <i class="bi bi-pencil me-1"></i>Editar excursión
         </a>
         <a href="{% url 'excursion_eliminar' excursion.pk %}" class="btn btn-outline-danger btn-sm">
           <i class="bi bi-trash me-1"></i>Eliminar
         </a>
+        {% endif %}
         <a href="{% url 'excursiones_lista' %}" class="btn btn-outline-secondary btn-sm">
           <i class="bi bi-arrow-left me-1"></i>Volver a la lista
         </a>
       </div>
     </div>
+
+    <!-- Resumen rápido -->
+    <div class="card shadow-sm mt-3">
+      <div class="card-header bg-white">
+        <i class="bi bi-card-checklist me-2"></i><strong>Resumen</strong>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span class="text-muted small">Evidencias subidas</span>
+          <span class="badge bg-primary rounded-pill">{{ evidencias.count }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span class="text-muted small">Estudiantes</span>
+          <span class="badge bg-info rounded-pill">{{ excursion.num_estudiantes }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span class="text-muted small">Estado</span>
+          {% if excursion.estado == 'realizada' %}
+          <span class="badge bg-success">Realizada</span>
+          {% elif excursion.estado == 'cancelada' %}
+          <span class="badge bg-danger">Cancelada</span>
+          {% else %}
+          <span class="badge bg-primary">Programada</span>
+          {% endif %}
+        </li>
+      </ul>
+    </div>
   </div>
+
 </div>
 {% endblock %}

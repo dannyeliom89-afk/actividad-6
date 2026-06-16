@@ -343,17 +343,15 @@
         fetch(API_URL)
             .then(res => res.json())
             .then(data => {
-                // Aquí podrías actualizar el DOM si hay cambios, 
-                // pero lo más importante es que al cargar la página 
-                // Django ya inyectó todo lo necesario.
+                // Si hay cambios en el total de actividades, recargamos para asegurar consistencia
                 if (data.total !== parseInt("{{ actividades_mes|length }}")) {
-                    location.reload(); // Si hay cambios, recargamos para asegurar consistencia
+                    location.reload();
                 }
             })
             .catch(err => console.error(err));
     }
 
     setInterval(refresh, 30000);
-});
+    });
 </script>
 {% endblock %}

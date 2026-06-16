@@ -15,7 +15,11 @@
         {% endif %}
         <div>
           <h5 class="mb-0">{{ user.get_full_name|default:user.username }}</h5>
-          <small class="text-muted">{{ user.get_role_display }} — @{{ user.username }}</small>
+          <small class="text-muted">{{ user.get_role_display }} — @{{ user.username }}
+            {% if user.seccion_asignada %}
+            · <span class="badge bg-primary">{{ user.seccion_asignada }}</span>
+            {% endif %}
+          </small>
         </div>
       </div>
       <div class="card-body">
@@ -42,6 +46,15 @@
               <label class="form-label fw-semibold">Fecha de nacimiento</label>
               {{ form.fecha_nacimiento }}
             </div>
+            {% if not user.is_director %}
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">
+                <i class="bi bi-mortarboard me-1 text-primary"></i>Sección / Grado asignado
+              </label>
+              {{ form.seccion_asignada }}
+              <div class="form-text">Ej: 3B, 5A, ED.FISICA, PIP</div>
+            </div>
+            {% endif %}
             <div class="col-12">
               <label class="form-label fw-semibold">Foto de perfil</label>
               {{ form.foto_perfil }}

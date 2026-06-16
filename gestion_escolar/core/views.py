@@ -158,12 +158,9 @@ def dashboard(request):
 def actividades_lista(request):
     q = request.GET.get('q', '')
     estado = request.GET.get('estado', '')
-    user = request.user
 
-    if user.is_director:
-        qs = ActividadInstitucional.objects.all()
-    else:
-        qs = ActividadInstitucional.objects.filter(responsables=user)
+    # Todos los usuarios (director y docentes) ven TODAS las actividades
+    qs = ActividadInstitucional.objects.all()
 
     if q:
         qs = qs.filter(Q(titulo__icontains=q) | Q(descripcion__icontains=q))
@@ -196,11 +193,8 @@ def actividad_crear(request):
 
 @login_required
 def actividad_detalle(request, pk):
-    user = request.user
-    if user.is_director:
-        actividad = get_object_or_404(ActividadInstitucional, pk=pk)
-    else:
-        actividad = get_object_or_404(ActividadInstitucional, pk=pk, responsables=user)
+    # Cualquier usuario autenticado puede ver el detalle de una actividad
+    actividad = get_object_or_404(ActividadInstitucional, pk=pk)
 
     evidencias = actividad.evidencias.all().select_related('subido_por')
     form_evidencia = EvidenciaForm()
@@ -244,18 +238,38 @@ def actividad_eliminar(request, pk):
 
 @login_required
 def propuestas_lista(request):
+    """
+    - Director: ve todas las propuestas, con filtro por estado.
+    - Docente: ve sus propias propuestas (pendientes/rechazadas) + TODAS las aprobadas (de cualquier docente).
+    """
     user = request.user
+    estado = request.GET.get('estado', '')
+
     if user.is_director:
         qs = PropuestaActividad.objects.all()
-        estado = request.GET.get('estado', '')
         if estado:
             qs = qs.filter(estado=estado)
+        mis_propuestas = None
+        propuestas_aprobadas = None
     else:
-        qs = PropuestaActividad.objects.filter(propuesta_por=user)
-    qs = qs.select_related('propuesta_por', 'revisado_por')
+        # Propias propuestas pendientes/rechazadas
+        mis_propuestas = PropuestaActividad.objects.filter(
+            propuesta_por=user
+        ).exclude(estado='aprobada').select_related('propuesta_por', 'revisado_por')
+        # Todas las aprobadas (mural público de propuestas aprobadas)
+        propuestas_aprobadas = PropuestaActividad.objects.filter(
+            estado='aprobada'
+        ).select_related('propuesta_por', 'revisado_por')
+        qs = None  # no se usa en vista docente
+
+    if qs is not None:
+        qs = qs.select_related('propuesta_por', 'revisado_por')
+
     return render(request, 'propuestas/lista.html', {
         'propuestas': qs,
-        'estado': request.GET.get('estado', ''),
+        'mis_propuestas': mis_propuestas,
+        'propuestas_aprobadas': propuestas_aprobadas,
+        'estado': estado,
     })
 
 
@@ -277,7 +291,12 @@ def propuesta_detalle(request, pk):
     if user.is_director:
         propuesta = get_object_or_404(PropuestaActividad, pk=pk)
     else:
-        propuesta = get_object_or_404(PropuestaActividad, pk=pk, propuesta_por=user)
+        # Docentes pueden ver: sus propias propuestas O cualquier aprobada
+        propuesta = get_object_or_404(
+            PropuestaActividad,
+            Q(propuesta_por=user) | Q(estado='aprobada'),
+            pk=pk
+        )
     return render(request, 'propuestas/detalle.html', {'propuesta': propuesta})
 
 
@@ -291,14 +310,34 @@ def propuesta_revisar(request, pk):
         revision.fecha_revision = timezone.now()
         revision.save()
         accion = 'aprobada' if revision.estado == 'aprobada' else 'rechazada'
+
+        # ─── Si se APRUEBA: crear la ActividadInstitucional automáticamente ───
+        if revision.estado == 'aprobada':
+            actividad = ActividadInstitucional.objects.create(
+                titulo=propuesta.titulo,
+                descripcion=propuesta.descripcion,
+                fecha=propuesta.fecha_actividad_propuesta or timezone.now().date(),
+                created_by=request.user,
+                estado='pendiente',
+                lugar='',
+            )
+            actividad.responsables.add(propuesta.propuesta_por)
+            messages.info(
+                request,
+                f'✅ Actividad "{actividad.titulo}" creada automáticamente y visible para todos los docentes.'
+            )
+
         messages.success(request, f'Propuesta "{propuesta.titulo}" {accion} correctamente.')
 
         # Notificar al docente por mensaje interno
+        extra = ''
+        if revision.estado == 'aprobada':
+            extra = ' La propuesta ahora aparece como actividad institucional visible para todos los docentes.'
         Mensaje.objects.create(
             de_usuario=request.user,
             para_usuario=propuesta.propuesta_por,
             asunto=f'Tu propuesta fue {accion}: {propuesta.titulo}',
-            mensaje=f'Tu propuesta "{propuesta.titulo}" ha sido {accion}.\n\n'
+            mensaje=f'Tu propuesta "{propuesta.titulo}" ha sido {accion}.{extra}\n\n'
                     f'Comentario del director:\n{revision.observacion_admin or "Sin observaciones adicionales."}'
         )
         return redirect('propuestas_lista')
@@ -307,11 +346,8 @@ def propuesta_revisar(request, pk):
 
 @director_required
 def propuesta_eliminar(request, pk):
-    """El director puede eliminar propuestas rechazadas o pendientes sin aprobar."""
+    """El director puede eliminar CUALQUIER propuesta (pendiente, rechazada o aprobada)."""
     propuesta = get_object_or_404(PropuestaActividad, pk=pk)
-    if propuesta.estado == 'aprobada':
-        messages.error(request, 'No se pueden eliminar propuestas aprobadas.')
-        return redirect('propuestas_lista')
     if request.method == 'POST':
         titulo = propuesta.titulo
         propuesta.delete()
@@ -326,14 +362,16 @@ def propuesta_eliminar(request, pk):
 def excursiones_lista(request):
     user = request.user
     if user.is_director:
+        # El director ve TODAS las excursiones de todos los docentes
         qs = Excursion.objects.all()
     else:
+        # Cada docente solo ve SUS PROPIAS excursiones
         qs = Excursion.objects.filter(responsable=user)
-    qs = qs.select_related('seccion', 'destino', 'responsable').prefetch_related('evidencias')
+    qs = qs.select_related('seccion', 'destino', 'responsable').prefetch_related('evidencias').order_by('-fecha')
     return render(request, 'excursiones/lista.html', {'excursiones': qs})
 
 
-@login_required
+@docente_required
 def excursion_crear(request):
     form = ExcursionForm(request.POST or None, request.FILES or None)
     if request.method == 'POST' and form.is_valid():
@@ -349,25 +387,26 @@ def excursion_crear(request):
 def excursion_detalle(request, pk):
     user = request.user
     if user.is_director:
+        # El director puede ver el detalle de cualquier excursión
         excursion = get_object_or_404(Excursion, pk=pk)
     else:
+        # El docente solo puede ver SU PROPIA excursión
         excursion = get_object_or_404(Excursion, pk=pk, responsable=user)
     evidencias = excursion.evidencias.all()
     form_evidencia = EvidenciaForm()
+    es_responsable = (excursion.responsable == user)
     return render(request, 'excursiones/detalle.html', {
         'excursion': excursion,
         'evidencias': evidencias,
         'form_evidencia': form_evidencia,
+        'es_responsable': es_responsable,
     })
 
 
-@login_required
+@docente_required
 def excursion_editar(request, pk):
-    user = request.user
-    if user.is_director:
-        excursion = get_object_or_404(Excursion, pk=pk)
-    else:
-        excursion = get_object_or_404(Excursion, pk=pk, responsable=user)
+    # Solo el docente responsable puede editar su propia excursión
+    excursion = get_object_or_404(Excursion, pk=pk, responsable=request.user)
     form = ExcursionForm(request.POST or None, request.FILES or None, instance=excursion)
     if request.method == 'POST' and form.is_valid():
         form.save()
@@ -376,13 +415,10 @@ def excursion_editar(request, pk):
     return render(request, 'excursiones/form.html', {'form': form, 'titulo': 'Editar Excursión', 'excursion': excursion})
 
 
-@login_required
+@docente_required
 def excursion_eliminar(request, pk):
-    user = request.user
-    if user.is_director:
-        excursion = get_object_or_404(Excursion, pk=pk)
-    else:
-        excursion = get_object_or_404(Excursion, pk=pk, responsable=user)
+    # Solo el docente responsable puede eliminar su propia excursión
+    excursion = get_object_or_404(Excursion, pk=pk, responsable=request.user)
     if request.method == 'POST':
         excursion.delete()
         messages.success(request, 'Excursión eliminada.')
@@ -450,11 +486,15 @@ def avisos_lista(request):
     if user.is_director:
         qs = Aviso.objects.filter(activo=True).select_related('creado_por')
     else:
-        qs = Aviso.objects.filter(
-            activo=True
-        ).filter(
-            Q(destinatarios=user) | Q(destinatarios__isnull=True)
+        # Docente ve: avisos sin destinatarios específicos (para todos) O donde está incluido
+        qs = Aviso.objects.filter(activo=True).filter(
+            Q(destinatarios__isnull=False, destinatarios=user) | Q(destinatarios__isnull=True)
         ).select_related('creado_por').distinct()
+        # Si la query no devuelve nada, mostrar todos los avisos sin destinatario específico
+        if not qs.exists():
+            qs = Aviso.objects.filter(activo=True).exclude(
+                destinatarios__isnull=False
+            ).select_related('creado_por')
     return render(request, 'avisos/lista.html', {'avisos': qs})
 
 
@@ -534,11 +574,8 @@ def mensaje_leer(request, pk):
 
 @login_required
 def reporte_actividad_pdf(request, pk):
-    user = request.user
-    if user.is_director:
-        actividad = get_object_or_404(ActividadInstitucional, pk=pk)
-    else:
-        actividad = get_object_or_404(ActividadInstitucional, pk=pk, responsables=user)
+    # Cualquier usuario autenticado puede descargar el PDF de una actividad
+    actividad = get_object_or_404(ActividadInstitucional, pk=pk)
     buffer = generar_pdf_actividad(actividad)
     response = HttpResponse(buffer, content_type='application/pdf')
     nombre = actividad.titulo.replace(' ', '_')[:40]
@@ -808,7 +845,7 @@ def chatbot_api(request):
                 return JsonResponse({'reply': 'La clave de Gemini no está configurada en .env.', 'status': 'error'})
 
             genai.configure(api_key=settings.GEMINI_API_KEY)
-            model = genai.GenerativeModel('gemini-pro')
+            model = genai.GenerativeModel('gemini-2.5-flash')
             
             context = (
                 f"Eres el Asistente Virtual Inteligente del sistema de Gestión Escolar del colegio 'María Auxiliadora'. "

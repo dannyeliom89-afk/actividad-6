@@ -1,0 +1,173 @@
+﻿python.exe : 
+C:\Users\USER\actividad 6to\g
+estion_escolar\core\views.py:
+12: FutureWarning: 
+En línea: 1 Carácter: 1
++ & "c:\Users\USER\actividad 
+6to\gestion_escolar\venv\Scri
+pts\python.ex ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (C:\User  
+  s\USER\a...FutureWarning   
+ : :String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+
+All support for the 
+`google.generativeai` 
+package has ended. It will 
+no longer be receiving 
+updates or bug fixes. Please 
+switch to the `google.genai` 
+package as soon as possible.
+See README for more details:
+
+https://github.com/google-gem
+ini/deprecated-generative-ai-
+python/blob/main/README.md
+
+  import google.generativeai 
+as genai
+  ­ƒùæ  13 usuario(s) eliminado(s).
+  Ô£ô Director creado  ÔåÆ  usuario: director | pass: Director2025!
+  Ô£ô Hulmer Ramiro Loayza Juanito  ÔåÆ  02410380 | 024103802025
+  Ô£ô Emilio Mamani Paris├╝a├▒a  ÔåÆ  41739925 | 417399252025
+  Ô£ô Dina Quisocala Lope  ÔåÆ  02435038 | 024350382025
+  Ô£ô Irma Sanchez Quispe  ÔåÆ  01556203 | 015562032025
+  Ô£ô Fredy Vargas Pampa  ÔåÆ  01983254 | 019832542025
+  Ô£ô Nury Sabina Lanza Gallegos  ÔåÆ  02410319 | 024103192025
+  Ô£ô Carmen Rosa Lopez Tavera De C  ÔåÆ  01488595 | 014885952025
+  Ô£ô Justo Javier Quispe Quispe  ÔåÆ  02440823 | 024408232025
+  Ô£ô Karla Yanira Ramos Condori  ÔåÆ  44488698 | 444886982025
+  Ô£ô Jafet Jose Ramirez Paredes  ÔåÆ  02423471 | 024234712025
+  Ô£ô Severiano Quispe Fernandez  ÔåÆ  02369419 | 023694192025
+  Ô£ô Roger Calizaya Maldonado  ÔåÆ  02413994 | 024139942025
+  Ô£ô Ygor Pacori Quecara  ÔåÆ  42783818 | 427838182025
+  Ô£ô Semproniana Salazar Canaza  ÔåÆ  02164109 | 021641092025
+  Ô£ô Lidia Marina Bustinza Ticona  ÔåÆ  02161759 | 021617592025
+  Ô£ô Sonia Mercedes Gerpa Jove  ÔåÆ  42538013 | 425380132025
+  Ô£ô Nery Susana Gutierrez Mendoza  ÔåÆ  02403033 | 024030332025
+  Ô£ô Delia Rosa Apaza Mu├▒oz  ÔåÆ  02429163 | 024291632025
+  Ô£ô Ruth Yaneth Puma Vilca  ÔåÆ  46889637 | 468896372025
+  Ô£ô Ines Mamani Monzon  ÔåÆ  02366909 | 023669092025
+  Ô£ô Justo Willy Arias Zaravia  ÔåÆ  02407431 | 024074312025
+  Ô£ô Norma Justina Coapaza Quispe  ÔåÆ  01311793 | 013117932025
+  Ô£ô Juan Ticona Maquera  ÔåÆ  01287792 | 012877922025
+  Ô£ô Zaida Veronica Calizaya Castro  ÔåÆ  44842579 | 448425792025
+  Ô£ô Ana Maria Sucasaca Toledo  ÔåÆ  02444805 | 024448052025
+  Ô£ô Edgar Barrantes Vilca  ÔåÆ  43631908 | 436319082025
+  Ô£ô Martha Anely Gutierrez Chata  ÔåÆ  02145541 | 021455412025
+  Ô£ô Jorge Condori Mamani  ÔåÆ  01991131 | 019911312025
+  Ô£ô Lucrecia Ayqui Suca  ÔåÆ  02292149 | 022921492025
+  Ô£ô Marina Dionicia Miranda Yucra  ÔåÆ  40570576 | 405705762025
+  Ô£ô David Cahuana Ccallo  ÔåÆ  02298546 | 022985462025
+  Ô£ô Elizabeth Rosaura Escobedo Enriquez  ÔåÆ  02383657 | 023836572025
+  Ô£ô Clorinda Velasquez Chambi  ÔåÆ  42989168 | 429891682025
+  Ô£ô Constantino Coila Velasquez  ÔåÆ  01287328 | 012873282025
+  Ô£ô Amalia Paredes Calvo  ÔåÆ  02444317 | 024443172025
+  Ô£ô Nelly Maritza Mamani Mamani  ÔåÆ  45522867 | 455228672025
+  Ô£ô Fabiana Mamani Chambi  ÔåÆ  02011582 | 020115822025
+  Ô£ô Gina Gloria Masco Mayta  ÔåÆ  02445905 | 024459052025
+  Ô£ô Luz Mirian Canaza Mamani  ÔåÆ  43744049 | 437440492025
+  Ô£ô Walker Anibal Ramos Caceres  ÔåÆ  01683781 | 016837812025
+  Ô£ô Genoveva Acero Ticona  ÔåÆ  44657495 | 446574952025
+  Ô£ô Mauro Ermita├▒o Amanqui Mamani  ÔåÆ  01491866 | 014918662025
+  Ô£ô Gerardo Victorino Mamani Reyes  ÔåÆ  41404641 | 414046412025
+  Ô£ô Lourdes Rossel Cespedes  ÔåÆ  02520668 | 025206682025
+  Ô£ô Cleto Marcelino Zamata Ticona  ÔåÆ  01540397 | 015403972025
+  Ô£ô Ruth Elizabeth Aquice Quispe  ÔåÆ  02429461 | 024294612025
+  Ô£ô Maria Magdalena Mollinedo Claverias  ÔåÆ  01334018 | 013340182025
+  Ô£ô Julio Ronalth Pino Yanqui  ÔåÆ  02415186 | 024151862025
+  Ô£ô Eddy Leoradia Ticona Mendez  ÔåÆ  02145684 | 021456842025
+  Ô£ô Paul Aquiles Pari Humpiri  ÔåÆ  80023144 | 800231442025
+  Ô£ô Juan Bonifacio Gutierrez Viza  ÔåÆ  02152553 | 021525532025
+  Ô£ô Francisco Alfredo Arapa Mamani  ÔåÆ  02390259 | 023902592025
+  Ô£ô Edith Quispe Tapia  ÔåÆ  40267197 | 402671972025
+  Ô£ô Adrian Vilcapaza Ccuno  ÔåÆ  02436532 | 024365322025
+  Ô£ô Hector Fredy Paricahua Condori  ÔåÆ  02430838 | 024308382025
+  Ô£ô Rosanel Yurby Zavala Ttito  ÔåÆ  47436846 | 474368462025
+  Ô£ô Nieves Pilar Huaynacho Quispe  ÔåÆ  45387482 | 453874822025
+  Ô£ô Lidia Marina Miranda Flores  ÔåÆ  01284808 | 012848082025
+  Ô£ô Hilario Cayo Flores  ÔåÆ  02037795 | 020377952025
+  Ô£ô Gregorio Daniel Quiza Quispe  ÔåÆ  02441981 | 024419812025
+  Ô£ô Efrain Anastacion Yucra Yapo  ÔåÆ  02377539 | 023775392025
+  Ô£ô Isaac Betancur Pacori  ÔåÆ  02421196 | 024211962025
+  Ô£ô Flora Ccari Coyla  ÔåÆ  02145908 | 021459082025
+
+ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+Ô£à  64 cuentas creadas exitosamente.
+ÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉ
+
+  CREDENCIALES COMPLETAS:
+  ROL            USUARIO (CI)   CONTRASE├æA         NOMBRE COMPLETO
+  ---------------------------------------------------------------------------
+  DIRECTOR       director       Director2025!      Director IE 1122
+  DOCENTE        02410380       024103802025       Hulmer Ramiro Loayza Juanito (1A)
+  DOCENTE        41739925       417399252025       Emilio Mamani Paris├╝a├▒a (1B)
+  DOCENTE        02435038       024350382025       Dina Quisocala Lope (1C)
+  DOCENTE        01556203       015562032025       Irma Sanchez Quispe (1D)
+  DOCENTE        01983254       019832542025       Fredy Vargas Pampa (1E)
+  DOCENTE        02410319       024103192025       Nury Sabina Lanza Gallegos (1F)
+  DOCENTE        01488595       014885952025       Carmen Rosa Lopez Tavera De C (1G)
+  DOCENTE        02440823       024408232025       Justo Javier Quispe Quispe (1H)
+  DOCENTE        44488698       444886982025       Karla Yanira Ramos Condori (2A)
+  DOCENTE        02423471       024234712025       Jafet Jose Ramirez Paredes (2B)
+  DOCENTE        02369419       023694192025       Severiano Quispe Fernandez (2C)
+  DOCENTE        02413994       024139942025       Roger Calizaya Maldonado (2D)
+  DOCENTE        42783818       427838182025       Ygor Pacori Quecara (2E)
+  DOCENTE        02164109       021641092025       Semproniana Salazar Canaza (2F)
+  DOCENTE        02161759       021617592025       Lidia Marina Bustinza Ticona (2G)
+  DOCENTE        42538013       425380132025       Sonia Mercedes Gerpa Jove (2H)
+  DOCENTE        02403033       024030332025       Nery Susana Gutierrez Mendoza (3A)
+  DOCENTE        02429163       024291632025       Delia Rosa Apaza Mu├▒oz (3B)
+  DOCENTE        46889637       468896372025       Ruth Yaneth Puma Vilca (3C)
+  DOCENTE        02366909       023669092025       Ines Mamani Monzon (3D)
+  DOCENTE        02407431       024074312025       Justo Willy Arias Zaravia (3E)
+  DOCENTE        01311793       013117932025       Norma Justina Coapaza Quispe (3F)
+  DOCENTE        01287792       012877922025       Juan Ticona Maquera (3G)
+  DOCENTE        44842579       448425792025       Zaida Veronica Calizaya Castro (3H)
+  DOCENTE        02444805       024448052025       Ana Maria Sucasaca Toledo (4A)
+  DOCENTE        43631908       436319082025       Edgar Barrantes Vilca (4B)
+  DOCENTE        02145541       021455412025       Martha Anely Gutierrez Chata (4C)
+  DOCENTE        01991131       019911312025       Jorge Condori Mamani (4D)
+  DOCENTE        02292149       022921492025       Lucrecia Ayqui Suca (4E)
+  DOCENTE        40570576       405705762025       Marina Dionicia Miranda Yucra (4F)
+  DOCENTE        02298546       022985462025       David Cahuana Ccallo (4G)
+  DOCENTE        02383657       023836572025       Elizabeth Rosaura Escobedo Enriquez (4H)
+  DOCENTE        42989168       429891682025       Clorinda Velasquez Chambi (5A)
+  DOCENTE        01287328       012873282025       Constantino Coila Velasquez (5B)
+  DOCENTE        02444317       024443172025       Amalia Paredes Calvo (5C)
+  DOCENTE        45522867       455228672025       Nelly Maritza Mamani Mamani (5D)
+  DOCENTE        02011582       020115822025       Fabiana Mamani Chambi (5E)
+  DOCENTE        02445905       024459052025       Gina Gloria Masco Mayta (5F)
+  DOCENTE        43744049       437440492025       Luz Mirian Canaza Mamani (5G)
+  DOCENTE        01683781       016837812025       Walker Anibal Ramos Caceres (5H)
+  DOCENTE        44657495       446574952025       Genoveva Acero Ticona (6A)
+  DOCENTE        01491866       014918662025       Mauro Ermita├▒o Amanqui Mamani (6B)
+  DOCENTE        41404641       414046412025       Gerardo Victorino Mamani Reyes (6C)
+  DOCENTE        02520668       025206682025       Lourdes Rossel Cespedes (6D)
+  DOCENTE        01540397       015403972025       Cleto Marcelino Zamata Ticona (6E)
+  DOCENTE        02429461       024294612025       Ruth Elizabeth Aquice Quispe (6F)
+  DOCENTE        01334018       013340182025       Maria Magdalena Mollinedo Claverias (6G)
+  DOCENTE        02415186       024151862025       Julio Ronalth Pino Yanqui (6H)
+  DOCENTE        02145684       021456842025       Eddy Leoradia Ticona Mendez (ED.FISICA)
+  DOCENTE        80023144       800231442025       Paul Aquiles Pari Humpiri (ED.FISICA)
+  DOCENTE        02152553       021525532025       Juan Bonifacio Gutierrez Viza (ED.FISICA)
+  DOCENTE        02390259       023902592025       Francisco Alfredo Arapa Mamani (ED.FISICA)
+  DOCENTE        40267197       402671972025       Edith Quispe Tapia (ED.FISICA)
+  DOCENTE        02436532       024365322025       Adrian Vilcapaza Ccuno (PIP)
+  DOCENTE        02430838       024308382025       Hector Fredy Paricahua Condori (PIP)
+  DOCENTE        47436846       474368462025       Rosanel Yurby Zavala Ttito (PSICOLOGIA)
+  DOCENTE        45387482       453874822025       Nieves Pilar Huaynacho Quispe (SECRETARIA)
+  DOCENTE        01284808       012848082025       Lidia Marina Miranda Flores (AUXILIAR DE B)
+  DOCENTE        02037795       020377952025       Hilario Cayo Flores (TRABAJADOR D)
+  DOCENTE        02441981       024419812025       Gregorio Daniel Quiza Quispe (TRABAJADOR D)
+  DOCENTE        02377539       023775392025       Efrain Anastacion Yucra Yapo (TRABAJADOR D)
+  DOCENTE        02421196       024211962025       Isaac Betancur Pacori (TRABAJADOR D)
+  DOCENTE        02145908       021459082025       Flora Ccari Coyla (TRABAJADOR D)
+

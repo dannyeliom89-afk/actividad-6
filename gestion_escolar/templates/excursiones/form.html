@@ -12,14 +12,19 @@
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row g-3">
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">Sección <span class="text-danger">*</span></label>
-              {{ form.seccion }}
-            </div>
-            <div class="col-md-6">
+
+            <div class="col-12">
               <label class="form-label fw-semibold">Destino <span class="text-danger">*</span></label>
-              {{ form.destino }}
+              {{ form.destino_nombre }}
+              <small class="text-muted">Ej: Parque Huajsapata, Museo, Lago Titicaca</small>
             </div>
+
+            <div class="col-12">
+              <label class="form-label fw-semibold">Grado y Sección</label>
+              {{ form.grado_seccion }}
+              <small class="text-muted">Ej: 3er Grado "A", 5to Primaria "B", 4to "C"</small>
+            </div>
+
             <div class="col-md-6">
               <label class="form-label fw-semibold">Fecha <span class="text-danger">*</span></label>
               {{ form.fecha }}
