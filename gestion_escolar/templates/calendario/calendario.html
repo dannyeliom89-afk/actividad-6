@@ -297,8 +297,7 @@
             <div class="card border-0 shadow-sm" style="border-radius:1rem;">
                 <div class="card-header bg-white py-3 border-bottom-0 d-flex align-items-center">
                     <h6 class="mb-0 fw-bold text-primary">Agenda de Actividades</h6>
-                    <span class="ms-auto badge bg-primary rounded-pill" id="side-count-badge">{{ actividades_mes|length
-                        }}</span>
+                    <span class="ms-auto badge bg-primary rounded-pill" id="side-count-badge">{{ actividades_mes|length }}</span>
                 </div>
                 <div class="card-body p-3 pt-0" id="side-list-container" style="max-height: 650px; overflow-y: auto;">
                     {% if actividades_mes %}
@@ -313,8 +312,7 @@
                             {% if a.lugar %}
                             <div class="act-lugar"><i class="bi bi-geo-alt me-1"></i>{{ a.lugar }}</div>
                             {% endif %}
-                            <span class="badge badge-{{ a.estado }} mt-1" style="font-size:10px">{{ a.get_estado_display
-                                }}</span>
+                            <span class="badge badge-{{ a.estado }} mt-1" style="font-size:10px">{{ a.get_estado_display }}</span>
                         </div>
                     </a>
                     {% endfor %}
