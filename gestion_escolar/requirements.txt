@@ -6,3 +6,4 @@ python-dotenv>=1.0
 django-crispy-forms>=2.1
 crispy-bootstrap5>=2024.2
 whitenoise>=6.0
+gunicorn>=21.2
