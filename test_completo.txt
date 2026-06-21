@@ -1,0 +1,22 @@
+﻿venv\Scripts\python.exe : 
+C:\Users\USER\actividad 6to\g
+estion_escolar\venv\Scripts\p
+ython.exe: can't open file 
+'C:\\Users\\USER\\actividad 6
+to\\gestion_escolar\\test_run
+ner.py': [Errno 2] No such 
+file or directory
+En línea: 1 Carácter: 1
++ venv\Scripts\python.exe 
+test_runner.py 2>&1 | 
+Out-File "C:\Users\USER ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (C:\User  
+  s\USER\a...le or directo   
+ ry:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 

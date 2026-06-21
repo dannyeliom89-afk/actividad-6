@@ -1,0 +1,35 @@
+﻿=== USUARIOS ===
+  ID:1 | director | director | simon fredy parrilla
+  ID:2 | docente1 | docente | Ana Flores Huanca
+  ID:3 | docente2 | docente | Luis Quispe Mamani
+  ID:4 | docente3 | docente | MarÝa Condori Apaza
+  ID:5 | docente4 | docente | JosÚ Ccama Ticona
+  ID:6 | danny@1122.com | docente | danny llanos huisa
+  ID:7 | admin | director | simon fredy parrilla
+  ID:8 | maicol123 | docente | maicol cayo
+  ID:9 | docente_test | docente | Docente Test
+  ID:10 | docente_prueba | docente | Carlos Sanchez
+=== ACTIVIDADES ===
+  ID:1 | DÝa del Logro Escolar 2024 | estado:pendiente | evidencias:0
+  ID:2 | Taller de Valores Institucionales | estado:finalizada | evidencias:0
+  ID:3 | Campa±a de Salud Bucal | estado:en_proceso | evidencias:0
+  ID:4 | Concurso de Danzas Folkl¾ricas | estado:finalizada | evidencias:0
+  ID:5 | Simulacro de Sismo | estado:pendiente | evidencias:0
+  ID:6 | Feria CientÝfica 2024 | estado:en_proceso | evidencias:0
+  ID:7 | Actividad de Prueba | estado:pendiente | evidencias:0
+  ID:8 | Actividad Test de Verificacion | estado:pendiente | evidencias:0
+=== EXCURSIONES ===
+  ID:1 | Isla de los Uros | seccion:6░ A | evidencias:0
+  ID:2 | Chullpas de Sillustani | seccion:5░ A | evidencias:0
+  ID:3 | Parque Ecol¾gico de Puno | seccion:4░ A | evidencias:0
+  ID:4 | Centro Hist¾rico de Puno | seccion:3░ B | evidencias:0
+  ID:5 | Isla de los Uros | seccion:6░ A | evidencias:0
+  ID:6 | Chullpas de Sillustani | seccion:5░ A | evidencias:0
+  ID:7 | Parque Ecol¾gico de Puno | seccion:4░ A | evidencias:0
+  ID:8 | Centro Hist¾rico de Puno | seccion:3░ B | evidencias:0
+=== PROPUESTAS ===
+  ID:2 | Taller de Reciclaje Creativo | estado:aprobada | por:docente2
+  ID:4 | Concurso de Oratoria Escolar | estado:aprobada | por:docente4
+  ID:5 | Visita al Planetario Virtual | estado:aprobada | por:docente1
+  ID:6 | Escuela de Padres ù Sesi¾n TecnologÝa | estado:rechazada | por:docente3
+  ID:7 | dia del logro | estado:rechazada | por:docente1

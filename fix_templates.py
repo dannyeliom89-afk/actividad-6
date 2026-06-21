@@ -11,10 +11,17 @@ def fix_file(path):
     with open(path, 'w', encoding='utf-8', newline='\n') as f:
         f.write(new_content)
 
-files = [
-    r'c:\Users\USER\actividad 6to\gestion_escolar\templates\base.html',
-    r'c:\Users\USER\actividad 6to\gestion_escolar\templates\calendario\calendario.html'
-]
+import os
+
+def get_all_templates(directory):
+    templates = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".html"):
+                templates.append(os.path.join(root, file))
+    return templates
+
+files = get_all_templates(r'c:\Users\USER\actividad 6to\gestion_escolar\templates')
 
 for f in files:
     try:
